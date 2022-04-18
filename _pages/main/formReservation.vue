@@ -450,7 +450,9 @@ export default {
         //Request params
         let requestParams = {
           refresh: refresh,
-          params: {}
+          params: {
+            filter: { hasServices:true }
+          }
         }
         //Request
         this.$crud.index('apiRoutes.qbooking.categories', requestParams).then(response => {
