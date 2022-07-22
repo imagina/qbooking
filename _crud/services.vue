@@ -89,15 +89,16 @@ export default {
             }
           },
           formId: {
+            value: null,
             type: 'select',
             props: {
               label: `${this.$tr('isite.cms.label.form')}`,
-              clearable: true,
+              //clearable: true,
               vIf: config('app.mode') == 'ipanel' ? false : true,
             },
             loadOptions: {
               apiRoute: 'apiRoutes.qform.forms',
-              select: {label: 'title', value: 'id'}
+              select: {label: 'title', id: 'id'}
             }
           },
           description: {
