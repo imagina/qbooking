@@ -1,7 +1,7 @@
 <template>
   <div id="reservationsPage">
     <!--page actions-->
-    <div class="box box-auto-height q-mb-md">
+    <div class="box box-auto-height q-mb-md" v-if="false">
       <page-actions :title="$route.meta.title" :extra-actions="extraPageActions" @refresh="getData(true)"
                     @new="$router.push({name : 'qbooking.panel.reservations.create'})"/>
     </div>
