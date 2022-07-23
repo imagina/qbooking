@@ -208,8 +208,10 @@ export default {
   computed: {
     //Return settings data
     settings() {
+      var timeRangeFilterSetting = this.$store.getters['qsiteApp/getSettingValueByName']('ibooking::timeRangeFilter') || '{}'
+
       return {
-        timeRangeFilter: JSON.parse(this.$store.getters['qsiteApp/getSettingValueByName']('ibooking::timeRangeFilter') || '{}'),
+        timeRangeFilter: typeof timeRangeFilterSetting === 'string' ? JSON.parse(timeRangeFilterSetting) : timeRangeFilterSetting,
         allowPublicReservation: parseInt(this.$store.getters['qsiteApp/getSettingValueByName']('ibooking::allowPublicReservation'))
       }
     },
