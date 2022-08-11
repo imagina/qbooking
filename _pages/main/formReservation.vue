@@ -28,7 +28,7 @@
                  :style="`background-image : url('${resourceData.mediaFiles.mainimage.path}')`"></div>
           </template>
           <div class="ellipsis text-weight-bold">{{ resourceData.title }}</div>
-          <div class="ellipsis-2-lines text-caption" v-html="resourceData.description" />
+          <div class="ellipsis-2-lines text-caption" v-html="resourceData.description"/>
         </q-banner>
         <!--Separator-->
         <q-separator v-else class="q-mb-sm"/>
@@ -405,7 +405,9 @@ export default {
       return new Promise((resolve, reject) => {
         this.resourceData = false
         //Instance criteria
-        let criteria = this.filterByResource || this.$store.state.quserAuth.userId
+        let criteria = this.filterByResource || (config('app.mode') == 'ipanel' ? this.$store.state.quserAuth.userId : null)
+        //Validate to get resources
+        if (!criteria) return resolve(null)
         //Request params
         let requestParams = {
           refresh: refresh,
@@ -414,6 +416,7 @@ export default {
             filter: {field: this.filterByResource ? 'id' : 'created_by'}
           }
         }
+
         //Request
         this.$crud.show('apiRoutes.qbooking.resources', criteria, requestParams).then(response => {
           if (!response.data) return resolve(null)
@@ -453,7 +456,7 @@ export default {
         let requestParams = {
           refresh: refresh,
           params: {
-            filter: { hasServices:true }
+            filter: {hasServices: true}
           }
         }
         //Request
