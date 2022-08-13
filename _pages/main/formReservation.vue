@@ -10,9 +10,35 @@
       <div class="box text-center" v-if="successReserve">
         <div class="q-py-lg">
           <q-icon name="fas fa-check-circle" color="green" size="50px" class="q-mb-md"/>
-          <div class="text-grey-8 text-h5 q-mb-md">¡{{ $tr('isite.cms.label.reserved') }}!</div>
-          <q-btn :label="$tr('isite.cms.label.finalize')" color="green" rounded unelevated
-                 @click="actionAfterReservation()"/>
+          <div class="text-grey-8 q-mb-md">
+            <div class="text-h5">
+              ¡{{ $tr('isite.cms.label.reserved') }} {{ reservationData ? `#${reservationData.id}` : '' }}!
+            </div>
+            <div v-if="reservationData"> {{ $tr('isite.cms.label.state') }}: {{ reservationData.statusName }}</div>
+          </div>
+          <!-- Reservation Items-->
+          <div v-if="reservationData" class="q-px-sm q-mb-md">
+            <q-list bordered separator>
+              <q-item v-for="(item, keyItem) in reservationData.items" :key="keyItem">
+                <q-item-section class="text-grey-9 text-left">
+                  <q-item-label v-if="item.categoryTitle"> {{ item.categoryTitle }}</q-item-label>
+                  <q-item-label v-if="item.serviceTitle">{{ item.serviceTitle }}</q-item-label>
+                  <q-item-label v-if="item.resourceTitle">{{ item.resourceTitle }}</q-item-label>
+                  <q-item-label v-if="item.startDate" class="q-pt-sm">
+                    {{ $trd(item.startDate, {type: 'long'}) }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </div>
+          <q-separator class="q-mb-md"/>
+          <!--Action-->
+          <div class="row q-gutter-md justify-center">
+            <q-btn :label="$tr('ibooking.cms.newReservation')" color="blue" rounded unelevated
+                   @click="actionAfterReservation(true)" flat/>
+            <q-btn :label="$tr('isite.cms.label.finalize')" color="green" rounded unelevated
+                   @click="actionAfterReservation()" flat/>
+          </div>
         </div>
       </div>
       <!--Form content-->
@@ -202,7 +228,8 @@ export default {
       services: [],
       resources: [],
       availabilities: [],
-      serviceForm: {}
+      serviceForm: {},
+      reservationData: null
     }
   },
   computed: {
@@ -310,7 +337,7 @@ export default {
                 (this.filters[`${this.step}Id`] ? false : true) : false
           },
           action: () => {
-            //Actions to next step
+            //Actions tƒo next step
             let actions = {
               category: this.filterByResource ? false : () => this.getServices(true),
               service: () => this.filterByResource ? false : this.getResources(true),
@@ -391,6 +418,7 @@ export default {
   methods: {
     init() {
       this.serviceForm = this.$clone(this.dataServiceForm)
+      this.successReserve = false
       this.getData(true)
     },
     //get data
@@ -584,8 +612,8 @@ export default {
         //Request
         this.$crud.create('apiRoutes.qbooking.reservations', requestData).then(response => {
           this.successReserve = true
-          if (response.data && response.data.redirectTo)
-            this.$helper.openExternalURL(response.data.redirectTo, true)
+          this.reservationData = response.data.reservation
+          if (response.data && response.data.redirectTo) this.$helper.openExternalURL(response.data.redirectTo, true)
           this.loading = false
         }).catch(error => {
           this.loading = false
@@ -593,11 +621,14 @@ export default {
       })
     },
     //Redirect after reservation
-    actionAfterReservation() {
-      if (this.$store.state.quserAuth.authenticated) {
-        this.$router.push({name: 'qbooking.panel.reservations.index'})
-      } else {
-        window.location.href = this.$store.state.qsiteApp.baseUrl
+    actionAfterReservation(newReservation = false) {
+      if (newReservation) window.location.reload()
+      else {
+        if (this.$store.state.quserAuth.authenticated) {
+          this.$router.push({name: 'qbooking.panel.reservations.index'})
+        } else {
+          window.location.href = this.$store.state.qsiteApp.baseUrl
+        }
       }
     }
   }
