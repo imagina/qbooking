@@ -1,12 +1,11 @@
 <template>
   <div id="reservationsPage">
-    <!--page actions-->
-    <div class="box box-auto-height q-mb-md" v-if="false">
-      <page-actions :title="$route.meta.title" :extra-actions="extraPageActions" @refresh="getData(true)"
-                    @new="$router.push({name : 'qbooking.panel.reservations.create'})"/>
-    </div>
     <!--Calendar-->
     <div v-if="view == 'calendar'" class="relative-position">
+      <!-- Page actions -->
+      <page-actions :title="$route.meta.title" :extra-actions="extraPageActions" @refresh="getData(true)"
+                    @new="$router.push({name : 'qbooking.panel.reservations.create'})" class="q-mb-md"/>
+      <!--Calendar-->
       <calendar v-if="reservationsCalendar.length" :events-data="reservationsCalendar"/>
       <!--Empty result-->
       <div v-else class="box row items-center justify-center">
@@ -69,7 +68,7 @@ export default {
             {value: `${this.$tr('isite.cms.form.status')}: ${item.statusName}`},
             {
               icon: 'fas fa-play-circle',
-              value: `${item.reservation.customer.firstName} ${item.reservation.customer.lastName}`
+              value: `${item.reservation.customer?.firstName || ''} ${item.reservation.customer?.lastName || ''}`
             },
             {icon: 'fas fa-play-circle', value: item.categoryTitle},
             {icon: 'fas fa-play-circle', value: item.resourceTitle},
