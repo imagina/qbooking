@@ -3,7 +3,7 @@
     <!--Calendar-->
     <div v-if="view == 'calendar'" class="relative-position">
       <!-- Page actions -->
-      <page-actions :title="$route.meta.title" :extra-actions="extraPageActions" @refresh="getData(true)"
+      <page-actions :title="$tr($route.meta.title)" :extra-actions="extraPageActions" @refresh="getData(true)"
                     @new="$router.push({name : 'qbooking.panel.reservations.create'})" class="q-mb-md"/>
       <!--Calendar-->
       <calendar v-if="reservationsCalendar.length" :events-data="reservationsCalendar"/>
@@ -15,7 +15,7 @@
       <inner-loading :visible="loading"/>
     </div>
     <!--Crud-->
-    <crud v-else :crud-data="import('@imagina/qbooking/_crud/reservations')"/>
+    <crud v-else :crud-data="import('@imagina/qbooking/_crud/reservations')" :title="$tr($route.meta.title)"/>
   </div>
 </template>
 <script>
