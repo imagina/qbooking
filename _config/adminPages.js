@@ -9,7 +9,7 @@ export default {
     page: () => import('@imagina/qcrud/_pages/admin/crudPage'),
     layout: () => import('@imagina/qsite/_layouts/master.vue'),
     title: 'ibooking.cms.sidebar.adminResources',
-    icon: 'fas fa-chess-knight',
+    icon: 'fa-light fa-chess-knight',
     subHeader: {
       refresh: true,
     }

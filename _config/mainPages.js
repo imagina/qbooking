@@ -9,7 +9,7 @@ export default {
     page: () => import('@imagina/qcrud/_pages/admin/crudPage'),
     layout: () => import('@imagina/qsite/_layouts/master.vue'),
     title: 'ibooking.cms.sidebar.adminCategories',
-    icon: 'fas fa-layer-group',
+    icon: 'fa-light fa-layer-group',
     subHeader: {
       refresh: true,
     }
@@ -24,7 +24,7 @@ export default {
     page: () => import('@imagina/qcrud/_pages/admin/crudPage'),
     layout: () => import('@imagina/qsite/_layouts/master.vue'),
     title: 'ibooking.cms.sidebar.adminServices',
-    icon: 'fas fa-handshake',
+    icon: 'fa-light fa-handshake',
     subHeader: {
       refresh: true,
     }
@@ -38,7 +38,7 @@ export default {
     page: () => import('@imagina/qbooking/_pages/main/reservations'),
     layout: () => import('@imagina/qsite/_layouts/master.vue'),
     title: 'ibooking.cms.sidebar.panelReservations',
-    icon: 'fas fa-tasks',
+    icon: 'fa-light fa-check-to-slot',
     subHeader: {
       refresh: true,
     }
@@ -52,7 +52,7 @@ export default {
     page: () => import('@imagina/qbooking/_pages/main/formReservation'),
     layout: () => import('@imagina/qsite/_layouts/master.vue'),
     title: 'ibooking.cms.sidebar.panelNewReservation',
-    icon: 'fas fa-tasks',
+    icon: 'fa-light fa-check-to-slot',
     subHeader: {
       refresh: true,
     }
@@ -66,6 +66,6 @@ export default {
     page: () => import('@imagina/qbooking/_pages/main/formReservation'),
     layout: () => import('@imagina/qsite/_layouts/blankLogo.vue'),
     title: 'ibooking.cms.sidebar.panelNewReservation',
-    icon: 'fas fa-tasks'
+    icon: 'fa-light fa-check-to-slot'
   }
 }

@@ -9,7 +9,7 @@ export default {
     page: () => import('@imagina/qbooking/_pages/panel/userResource'),
     layout: () => import('@imagina/qsite/_layouts/master.vue'),
     title: 'ibooking.cms.sidebar.panelUserResource',
-    icon: 'fas fa-hourglass',
+    icon: 'fa-light fa-calendar-lines-pen',
     subHeader: {
       refresh: true,
     }
