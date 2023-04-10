@@ -304,7 +304,9 @@ export default {
             this.loading = false
           }, 200)
         }).catch(error => {
-          this.loading = false
+          this.$apiResponse.handleError(error, () => {
+            this.loading = false
+          })
         })
       })
     },

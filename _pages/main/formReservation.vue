@@ -492,7 +492,9 @@ export default {
           this.categories = response.data
           resolve(response.data)
         }).catch(error => {
-          resolve(error)
+          this.$apiResponse.handleError(error, () => {
+            resolve(error)
+          })
         })
       })
     },
@@ -514,8 +516,10 @@ export default {
           resolve(response.data)
           this.loading = false
         }).catch(error => {
-          reject(error)
-          this.loading = false
+          this.$apiResponse.handleError(error, () => {
+            this.loading = false
+            reject(error)
+          })
         })
       })
     },
@@ -535,8 +539,10 @@ export default {
           resolve(response.data)
           this.loading = false
         }).catch(error => {
-          reject(error)
-          this.loading = false
+          this.$apiResponse.handleError(error, () => {
+            this.loading = false
+            reject(error)
+          })
         })
       })
     },
@@ -567,8 +573,10 @@ export default {
           resolve(response.data)
           this.loading = false
         }).catch(error => {
-          reject(error)
-          this.loading = false
+          this.$apiResponse.handleError(error, () => {
+            this.loading = false
+            reject(error)
+          })
         })
       })
     },
