@@ -38,7 +38,7 @@ export default {
             },
             {name: 'actions', label: this.$tr('isite.cms.form.actions'), align: 'left'},
           ],
-          requestParams: {include: 'services'}
+          requestParams: {include: 'services,qrs'}
         },
         update: {
           title: this.$tr('ibooking.cms.updateResource'),
