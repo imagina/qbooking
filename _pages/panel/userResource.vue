@@ -350,7 +350,7 @@ export default {
   }
 }
 </script>
-<style lang="stylus">
+<style lang="sass">
 #userReousrcePage
   #meetSection
     #dynamicFormComponentContent

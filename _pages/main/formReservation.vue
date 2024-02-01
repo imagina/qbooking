@@ -642,7 +642,7 @@ export default {
   }
 }
 </script>
-<style lang="stylus">
+<style lang="sass">
 #panelReservationForm
   #bannerResourceData
     padding 15px
