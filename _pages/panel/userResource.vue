@@ -351,9 +351,12 @@ export default {
 }
 </script>
 <style lang="scss">
-#userReousrcePage
-  #meetSection
-    #dynamicFormComponentContent
-      box-shadow none
-      padding 0
+#userReousrcePage {
+  #meetSection {
+    #dynamicFormComponentContent {
+      box-shadow: none;
+      padding: 0;
+    }
+  }
+}
 </style>
