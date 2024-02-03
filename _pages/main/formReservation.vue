@@ -643,37 +643,44 @@ export default {
 }
 </script>
 <style lang="scss">
-#panelReservationForm
-  #bannerResourceData
-    padding 15px
-    border-radius 10px
+#panelReservationForm {
+  #bannerResourceData {
+    padding: 15px;
+    border-radius: 10px;
 
-    .resource-image
-      height 90px
-      width 90px
-      border-radius 10px
+    .resource-image {
+      height: 90px;
+      width: 90px;
+      border-radius: 10px;
+    }
+  }
 
-  .item-selectable
-    cursor pointer
-    padding 15px
-    border 2px solid $grey-4
-    border-radius $custom-radius
-    color $grey-9
-    line-height 1.2
+  .item-selectable {
+    cursor: pointer;
+    padding: 15px;
+    border: 2px solid $grey-4;
+    border-radius: $custom-radius;
+    color: $grey-9;
+    line-height: 1.2;
 
-    &.selected
-      border 2px solid $primary
+    &.selected {
+      border: 2px solid $primary;
+    }
 
-    .q-icon
-      background-color $grey-4
-      border-radius 50%
-      color white
-      height 40px
-      width 40px
-      font-size 18px
-      margin-right 15px
+    .q-icon {
+      background-color: $grey-4;
+      border-radius: 50%;
+      color: white;
+      height: 40px;
+      width: 40px;
+      font-size: 18px;
+      margin-right: 15px;
+    }
 
-    label
-      color $grey-9
-      cursor pointer
+    label {
+      color: $grey-9;
+      cursor: pointer;
+    }
+  }
+}
 </style>
