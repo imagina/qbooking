@@ -15,12 +15,12 @@
       <inner-loading :visible="loading"/>
     </div>
     <!--Crud-->
-    <crud v-else :crud-data="import('@imagina/qbooking/_crud/reservations')" :title="$tr($route.meta.title)"/>
+    <crud v-else :crud-data="import('modules/qbooking/_crud/reservations')" :title="$tr($route.meta.title)"/>
   </div>
 </template>
 <script>
 //Components
-import calendar from '@imagina/qsite/_components/master/calendar'
+import calendar from 'modules/qsite/_components/master/calendar'
 
 export default {
   props: {},
@@ -75,7 +75,7 @@ export default {
           ],
           card: {
             title: this.$tr('isite.cms.label.meet'),
-            component: () => import('@imagina/qbooking/_components/crud/reservationCard'),
+            component: () => import('modules/qbooking/_components/crud/reservationCard'),
             row: item
           }
         }

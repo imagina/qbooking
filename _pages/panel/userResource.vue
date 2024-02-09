@@ -141,7 +141,7 @@ export default {
                 type: 'crud',
                 props: {
                   type: 'select',
-                  crudData: import('@imagina/qbooking/_crud/services'),
+                  crudData: import('modules/qbooking/_crud/services'),
                   crudProps: {
                     label: `${this.$trp('isite.cms.label.service')}*`,
                     multiple: true,
