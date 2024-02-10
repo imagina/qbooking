@@ -6,8 +6,8 @@ export default {
     authenticated: true,
     path: '/booking/resource/user',
     name: 'qbooking.panel.resource.user',
-    page: () => import('@imagina/qbooking/_pages/panel/userResource'),
-    layout: () => import('@imagina/qsite/_layouts/master.vue'),
+    page: () => import('modules/qbooking/_pages/panel/userResource'),
+    layout: () => import('layouts/master.vue'),
     title: 'ibooking.cms.sidebar.panelUserResource',
     icon: 'fa-light fa-calendar-lines-pen',
     subHeader: {
