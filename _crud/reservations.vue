@@ -73,7 +73,7 @@ export default {
           ],
           requestParams: {include: 'reservation.customer,meetings,service,fields'},
           grid: {
-            component: () => import('@imagina/qbooking/_components/crud/reservationCard'),
+            component: () => import('modules/qbooking/_components/crud/reservationCard'),
           },
           filters: {
             userId: {
