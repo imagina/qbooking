@@ -5,9 +5,9 @@ export default {
     authenticated: true,
     path: '/booking/resources/index',
     name: 'qbooking.admin.resources',
-    crud: import('@imagina/qbooking/_crud/resources'),
-    page: () => import('@imagina/qcrud/_pages/admin/crudPage'),
-    layout: () => import('@imagina/qsite/_layouts/master.vue'),
+    crud: import('modules/qbooking/_crud/resources'),
+    page: () => import('modules/qcrud/_pages/admin/crudPage'),
+    layout: () => import('layouts/master.vue'),
     title: 'ibooking.cms.sidebar.adminResources',
     icon: 'fa-light fa-chess-knight',
     subHeader: {
