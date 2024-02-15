@@ -50,8 +50,10 @@
         <!--Resource data-->
         <q-banner v-if="resourceData" id="bannerResourceData" class="bg-primary text-white">
           <template v-slot:avatar>
-            <div class="resource-image img-as-bg"
-                 :style="`background-image : url('${resourceData.mediaFiles.mainimage.path}')`"></div>
+            <div 
+              class="resource-image img-as-bg"
+              :style="`background-image : url('${resourceData?.mediaFiles?.mainimage.path}')`"
+            />
           </template>
           <div class="ellipsis text-weight-bold">{{ resourceData.title }}</div>
           <div class="ellipsis-2-lines text-caption" v-html="resourceData.description"/>
