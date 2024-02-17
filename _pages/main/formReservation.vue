@@ -241,7 +241,7 @@ export default {
 
       return {
         timeRangeFilter: typeof timeRangeFilterSetting === 'string' ? JSON.parse(timeRangeFilterSetting) : timeRangeFilterSetting,
-        allowPublicReservation: parseInt(this.$store.getters['qsiteApp/getSettingValueByName']('ibooking::allowPublicReservation'))
+        allowPublicReservation: parseInt(this.$getSetting('ibooking::allowPublicReservation'))
       }
     },
     //Allow public reservations
