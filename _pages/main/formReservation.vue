@@ -50,7 +50,7 @@
         <!--Resource data-->
         <q-banner v-if="resourceData" id="bannerResourceData" class="bg-primary text-white">
           <template v-slot:avatar>
-            <div 
+            <div
               class="resource-image img-as-bg"
               :style="`background-image : url('${resourceData?.mediaFiles?.mainimage.path}')`"
             />
@@ -237,7 +237,7 @@ export default {
   computed: {
     //Return settings data
     settings() {
-      var timeRangeFilterSetting = this.$store.getters['qsiteApp/getSettingValueByName']('ibooking::timeRangeFilter') || '{}'
+      var timeRangeFilterSetting = this.$getSetting('ibooking::timeRangeFilter') || '{}'
 
       return {
         timeRangeFilter: typeof timeRangeFilterSetting === 'string' ? JSON.parse(timeRangeFilterSetting) : timeRangeFilterSetting,

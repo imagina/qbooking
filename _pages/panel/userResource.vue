@@ -55,7 +55,7 @@ export default {
     //Settings
     settings() {
       return {
-        createExternalMeeting: this.$store.getters['qsiteApp/getSettingValueByName']('ibooking::createExternalMeeting')
+        createExternalMeeting: this.$getSetting('ibooking::createExternalMeeting')
       }
     },
     //Return user data
@@ -151,7 +151,7 @@ export default {
                   },
                   config: {
                     requestParams: {
-                      filter: !this.$auth.hasAccess('ibooking.services.manage') ? {} :
+                      filter: !this.$hasAccess('ibooking.services.manage') ? {} :
                           {createdBy: this.$store.state.quserAuth.userId}
                     }
                   },
