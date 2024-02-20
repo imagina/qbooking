@@ -155,26 +155,34 @@
               </div>
               <!--Availabilities-->
               <div v-else class="row q-col-gutter-sm">
-                <div v-for="(availability, keyService) in availabilities" :key="keyService" class="col-12"
-                     @click="selectItem('availabilityId',availability.id)" v-if="!availability.isBusy">
-                  <div :class="`item-selectable row items-center ${classSelected('availabilityId',availability.id)}`">
-                    <!--Icon-->
-                    <q-icon name="fas fa-chess-knight"/>
-                    <!--Description-->
-                    <div class="text-left">
-                      <!--Category and services selected-->
-                      <div class="text-grey-6 text-caption">
-                        {{ selected.category.title }}, {{ selected.service.title }}
-                      </div>
-                      <!--Resource-->
-                      <div class="q-mb-xs">{{ availability.resource.title }}</div>
-                      <!--Shifts date-->
-                      <div class="text-blue">
-                        {{ $trd(`${availability.calendarDate} ${availability.startTime}`, {type: 'shortHuman'}) }}
+                <template
+                  v-for="(availability, keyService) in availabilities"
+                  :key="keyService"
+                >
+                  <div
+                    class="col-12"
+                    @click="selectItem('availabilityId',availability.id)"
+                    v-if="!availability.isBusy"
+                  >
+                    <div :class="`item-selectable row items-center ${classSelected('availabilityId',availability.id)}`">
+                      <!--Icon-->
+                      <q-icon name="fas fa-chess-knight"/>
+                      <!--Description-->
+                      <div class="text-left">
+                        <!--Category and services selected-->
+                        <div class="text-grey-6 text-caption">
+                          {{ selected.category.title }}, {{ selected.service.title }}
+                        </div>
+                        <!--Resource-->
+                        <div class="q-mb-xs">{{ availability.resource.title }}</div>
+                        <!--Shifts date-->
+                        <div class="text-blue">
+                          {{ $trd(`${availability.calendarDate} ${availability.startTime}`, {type: 'shortHuman'}) }}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </template>
               </div>
             </q-scroll-area>
           </q-tab-panel>
