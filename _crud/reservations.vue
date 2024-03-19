@@ -19,7 +19,10 @@
   </master-modal>
 </template>
 <script>
+import fileList from 'modules/qsite/_components/master/fileList'
+
 export default {
+  components: {fileList},
   data() {
     return {
       crudId: this.$uid(),
