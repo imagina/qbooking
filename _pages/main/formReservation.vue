@@ -443,7 +443,8 @@ export default {
       return new Promise((resolve, reject) => {
         this.resourceData = false
         //Instance criteria
-        let criteria = this.filterByResource || (config('app.mode') == 'ipanel' ? this.$store.state.quserAuth.userId : null)
+        let criteria = this.$route.meta.authenticated ? this.$store.state.quserAuth.userId : null;
+        criteria = this.filterByResource || criteria;
         //Validate to get resources
         if (!criteria) return resolve(null)
         //Request params
