@@ -4,39 +4,39 @@
     <div v-if="view == 'calendar'" class="relative-position">
       <!-- Page actions -->
       <page-actions :title="$tr($route.meta.title)" :extra-actions="extraPageActions" @refresh="getData(true)"
-                    @new="$router.push({name : 'qbooking.panel.reservations.create'})" class="q-mb-md"/>
+                    @new="$router.push({name : 'qbooking.panel.reservations.create'})" class="q-mb-md" />
       <!--Calendar-->
-      <calendar v-if="reservationsCalendar.length" :events-data="reservationsCalendar"/>
+      <calendar v-if="reservationsCalendar.length" :events-data="reservationsCalendar" />
       <!--Empty result-->
       <div v-else class="box row items-center justify-center">
-        <not-result/>
+        <not-result />
       </div>
       <!--Inner loading-->
-      <inner-loading :visible="loading"/>
+      <inner-loading :visible="loading" />
     </div>
     <!--Crud-->
-    <crud v-else :crud-data="import('modules/qbooking/_crud/reservations')" :title="$tr($route.meta.title)"/>
+    <crud v-else :crud-data="import('modules/qbooking/_crud/reservations')" :title="$tr($route.meta.title)" />
   </div>
 </template>
 <script>
 //Components
-import calendar from 'modules/qsite/_components/master/calendar'
+import calendar from 'modules/qsite/_components/master/calendar';
 
 export default {
   props: {},
-  components: {calendar},
+  components: { calendar },
   watch: {},
   mounted() {
-    this.$nextTick(function () {
-      this.init()
-    })
+    this.$nextTick(function() {
+      this.init();
+    });
   },
   data() {
     return {
       loading: false,
       view: config('app.mode') == 'ipanel' ? 'calendar' : 'crud',
-      reservations: []
-    }
+      reservationsCalendar: []
+    };
   },
   computed: {
     //Extra Page actions
@@ -48,71 +48,69 @@ export default {
           label: this.$tr(`isite.cms.label.view`),
           vIf: false,
           props: {
-            icon: this.view == "calendar" ? 'fas fa-list-ul' : 'fas fa-calendar-alt'
+            icon: this.view == 'calendar' ? 'fas fa-list-ul' : 'fas fa-calendar-alt'
           },
           action: () => {
-            this.view = (this.view == 'calendar') ? 'crud' : 'calendar'
+            this.view = (this.view == 'calendar') ? 'crud' : 'calendar';
           }
         }
-      ]
+      ];
+    }
+  },
+  methods: {
+    init() {
+      this.getData();
     },
-    //Reservations to calendar
-    reservationsCalendar() {
-      let response = this.reservations.reverse().map(item => {
+    //Get data
+    getData(refresh = false) {
+      return new Promise((resolve, reject) => {
+        this.loading = true;
+        //Requets params
+        let requestParams = {
+          refresh: refresh,
+          params: {
+            include: 'reservation.customer,meetings',
+            filter: config('app.mode') == 'iadmin' ? {} : { userId: this.$store.state.quserAuth.userId }
+          }
+        };
+        //Request
+        this.$crud.index('apiRoutes.qbooking.reservationItems', requestParams).then(response => {
+          this.mapReservations(response.data);
+          this.loading = false;
+        }).catch(error => {
+          this.$apiResponse.handleError(error, () => {
+            this.loading = false;
+          });
+        });
+      });
+    },
+    //Map the reservations data
+    mapReservations(data) {
+      this.reservationsCalendar = data.reverse().map(item => {
         return {
           icon: 'fas fa-calendar',
           color: 'primary',
           date: item.startDate,
           title: item.serviceTitle,
           mainDetails: [
-            {value: `${this.$tr('isite.cms.form.status')}: ${item.statusName}`},
+            { value: `${this.$tr('isite.cms.form.status')}: ${item.statusName}` },
             {
               icon: 'fas fa-play-circle',
               value: `${item.reservation.customer?.firstName || ''} ${item.reservation.customer?.lastName || ''}`
             },
-            {icon: 'fas fa-play-circle', value: item.categoryTitle},
-            {icon: 'fas fa-play-circle', value: item.resourceTitle},
+            { icon: 'fas fa-play-circle', value: item.categoryTitle },
+            { icon: 'fas fa-play-circle', value: item.resourceTitle }
           ],
           card: {
             title: this.$tr('isite.cms.label.meet'),
-            component: () => import('modules/qbooking/_components/crud/reservationCard'),
+            component: import('modules/qbooking/_components/crud/reservationCard'),
             row: item
           }
-        }
-      })
-
-      return response
-    }
-  },
-  methods: {
-    init() {
-      this.getData()
-    },
-    //Get data
-    getData(refresh = false) {
-      return new Promise((resolve, reject) => {
-        this.loading = true
-        //Requets params
-        let requestParams = {
-          refresh: refresh,
-          params: {
-            include: 'reservation.customer,meetings',
-            filter: config('app.mode') == 'iadmin' ? {} : {userId: this.$store.state.quserAuth.userId}
-          }
-        }
-        //Request
-        this.$crud.index('apiRoutes.qbooking.reservationItems', requestParams).then(response => {
-          this.reservations = response.data
-          this.loading = false
-        }).catch(error => {
-          this.$apiResponse.handleError(error, () => {
-            this.loading = false
-          })
-        })
-      })
+        };
+      });
     }
   }
-}
+};
 </script>
 <style lang="scss">
 </style>
