@@ -74,7 +74,7 @@ export default {
             },
             {name: 'actions', label: this.$tr('isite.cms.form.actions'), align: 'left'},
           ],
-          requestParams: {include: 'reservation.customer,meetings,service,fields'},
+          requestParams: {include: 'reservation.customer,service,fields'},
           grid: {
             component: () => import('modules/qbooking/_components/crud/reservationCard'),
           },

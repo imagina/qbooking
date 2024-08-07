@@ -24,6 +24,10 @@ export default {
             {name: 'slug', label: this.$tr('isite.cms.form.slug'), field: 'slug', align: 'left'},
             {name: 'status', label: this.$tr('isite.cms.form.status'), field: 'status', align: 'left'},
             {
+              name: 'assignedTo', label: this.$tr('isite.cms.form.assignedTo'), field: 'assignedTo', align: 'left',
+              format: val => val ? `${val.firstName} ${val.lastName}` : '-'
+            },
+            {
               name: 'services', label: this.$trp('isite.cms.label.service'), field: 'services',
               align: 'left', classes: 'ellipsis', style: 'max-width : 250px',
               format: val => val ? val.map(item => item.title).join(', ') : ''
@@ -38,7 +42,7 @@ export default {
             },
             {name: 'actions', label: this.$tr('isite.cms.form.actions'), align: 'left'},
           ],
-          requestParams: {include: 'services,qrs'}
+          requestParams: {include: 'services,qrs,assignedTo'}
         },
         update: {
           title: this.$tr('ibooking.cms.updateResource'),
@@ -97,6 +101,25 @@ export default {
                 val => !!val || this.$tr('isite.cms.message.fieldRequired')
               ],
             }
+          },
+          assignedToId: {
+            value: null,
+            type: 'crud',
+            props: {
+              crudType: 'select',
+              crudData: import('modules/quser/_crud/users'),
+              crudProps: {
+                label: `${i18n.trp('isite.cms.form.assignedTo')}*`,
+                rules: [
+                  val => !!val || this.$tr('isite.cms.message.fieldRequired')
+                ]
+              },
+              config: {
+                options: {
+                  label: 'fullName', value: 'id'
+                }
+              },
+            },
           },
           services: {
             value: [],

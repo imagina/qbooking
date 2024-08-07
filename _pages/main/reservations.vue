@@ -34,7 +34,7 @@ export default {
   data() {
     return {
       loading: false,
-      view: config('app.mode') == 'ipanel' ? 'calendar' : 'crud',
+      view: 'calendar',//config('app.mode') == 'ipanel' ? 'calendar' : 'crud',
       reservationsCalendar: []
     };
   },
@@ -69,7 +69,7 @@ export default {
         let requestParams = {
           refresh: refresh,
           params: {
-            include: 'reservation.customer,meetings',
+            include: 'reservation.customer',
             filter: config('app.mode') == 'iadmin' ? {} : { userId: this.$store.state.quserAuth.userId }
           }
         };
