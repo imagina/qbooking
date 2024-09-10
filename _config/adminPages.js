@@ -1,4 +1,15 @@
 export default {
+  productAgenda: {
+    permission: 'ibooking.reservations.manage',
+    activated: true,
+    authenticated: true,
+    path: '/booking/agenda',
+    name: 'qbooking.admin.agenda',
+    page: () => import('modules/qbooking/_pages/product/agenda'),
+    layout: () => import('layouts/master.vue'),
+    title: 'ibooking.cms.sidebar.panelReservations',
+    icon: 'fa-light fa-check-to-slot'
+  },
   resources: {
     permission: 'ibooking.resources.manage',
     activated: true,
@@ -11,7 +22,7 @@ export default {
     title: 'ibooking.cms.sidebar.adminResources',
     icon: 'fa-light fa-chess-knight',
     subHeader: {
-      refresh: true,
+      refresh: true
     }
   }
-}
+};
