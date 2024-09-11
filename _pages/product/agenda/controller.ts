@@ -29,14 +29,14 @@ export default function controller (props: any, emit: any)
             label: i18n.tr('isite.cms.label.resource'),
             field: 'items',
             align: 'left',
-            format: val => val[0].resourceTitle
+            format: val => val.length ? val[0].resourceTitle : '-'
           },
           {
             name: 'service',
             label: i18n.trp('isite.cms.label.service'),
             field: 'items',
             align: 'left',
-            format: val => val.map(item => item.serviceTitle).join('/')
+            format: val => val.length ? val.map(item => item.serviceTitle).join('/') : '-'
           },
           {
             name: 'customer',
@@ -56,14 +56,14 @@ export default function controller (props: any, emit: any)
             label: i18n.tr('isite.cms.label.hour'),
             field: 'items',
             align: 'left',
-            format: val => i18n.trd(val[0].startDate, { type: 'time' })
+            format: val => val.length ? i18n.trd(val[0].startDate, { type: 'time' }) : '-'
           },
           {
             name: 'startDate',
             label: i18n.tr('isite.cms.label.day'),
             field: 'items',
             align: 'left',
-            format: val => i18n.trd(val[0].startDate, { type: 'dayHuman' })
+            format: val => val.length ? i18n.trd(val[0].startDate, { type: 'dayHuman' }) : '-'
           },
           {
             name: 'estimateTime',
@@ -84,15 +84,17 @@ export default function controller (props: any, emit: any)
             label: '(pt) Precio',
             field: 'items',
             align: 'left',
-            format: val => {
-              let total = 0
-              val.forEach(item => total += item.price)
-              return `$ ${i18n.trn(total)}`
+            format: val =>
+            {
+              let total = 0;
+              val.forEach(item => total += item.price);
+              return `$ ${i18n.trn(total)}`;
             }
           }
         ],
         requestParams: {
-          include: 'customer,items.service,items.resource'
+          include: 'customer,items.service,items.resource',
+          filter: { orderByItemsDate: true }
         },
         filters: {},
         help: {}
