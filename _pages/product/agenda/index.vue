@@ -1,6 +1,6 @@
 <template>
   <div id="adminAgendaPage">
-    <dynamic-list :list-data="listConfig">
+    <dynamic-list :list-config="listConfig">
     </dynamic-list>
 
     <b>Tabla</b>
