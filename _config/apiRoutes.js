@@ -12,4 +12,5 @@ export default {
   reservations: `${urlBase}/reservations`,
   reservationItems: `${urlBase}/reservation-items`,
   availabilities: `${urlBase}/availabilities`,
+  statuses: `${urlBase}/statuses`,
 }

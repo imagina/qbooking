@@ -2,6 +2,8 @@ import { computed, reactive, ref, onMounted, toRefs, watch, getCurrentInstance }
 import service from '../agenda/services';
 import store from '../agenda/store';
 import { i18n } from 'src/plugins/utils';
+import moment from 'moment/moment';
+import colorCell from 'modules/qsite/_components/master/contentType/colorCell.vue';
 
 export default function controller (props: any, emit: any)
 {
@@ -25,18 +27,24 @@ export default function controller (props: any, emit: any)
         title: i18n.tr('ibooking.cms.sidebar.panelReservations'),
         columns: [
           {
+            name: 'id',
+            label: 'ID',
+            field: 'id',
+            align: 'left'
+          },
+          {
             name: 'resource',
             label: i18n.tr('isite.cms.label.resource'),
             field: 'items',
             align: 'left',
-            format: val => val.length ? val[0].resourceTitle : '-'
+            format: val => val.length ? val[0].resource.title : '-'
           },
           {
             name: 'service',
             label: i18n.trp('isite.cms.label.service'),
             field: 'items',
             align: 'left',
-            format: val => val.length ? val.map(item => item.serviceTitle).join('/') : '-'
+            format: val => val.length ? val.map(item => item.service.title).join(',') : '-'
           },
           {
             name: 'customer',
@@ -46,42 +54,51 @@ export default function controller (props: any, emit: any)
             format: val => val ? `${val.firstName} ${val.lastName}` : '-'
           },
           {
-            name: 'statusName',
+            name: 'status',
             label: i18n.tr('isite.cms.form.status'),
-            field: 'statusName',
+            field: 'statusModel',
+            style: 'padding: 0px 5px',
+            format: val => val.title,
+            dynamicField: {
+              type: 'select',
+              props: {
+                label: i18n.tr('isite.cms.form.status')
+              },
+              loadOptions: {
+                apiRoute: 'apiRoutes.qbooking.statuses'
+              }
+            }
+          },
+          {
+            name: 'startDate',
+            label: i18n.tr('isite.cms.label.date'),
+            field: 'startDate',
+            align: 'left',
+            format: val => val ? i18n.trd(val, { type: 'dayHuman' }) : '-'
+          },
+          {
+            name: 'startTime',
+            label: i18n.tr('isite.cms.startTime'),
+            field: 'startDate',
+            align: 'left',
+            format: val => val ? i18n.trd(val, { type: 'time' }) : '-'
+          },
+          {
+            name: 'endTime',
+            label: i18n.tr('isite.cms.endTime'),
+            field: 'endDate',
+            align: 'left',
+            format: val => val ? i18n.trd(val, { type: 'time' }) : '-'
+          },
+          {
+            name: 'shiftTime',
+            label: i18n.tr('isite.cms.shiftTime'),
+            field: 'humanShiftTime',
             align: 'left'
           },
           {
-            name: 'startDate',
-            label: i18n.tr('isite.cms.label.hour'),
-            field: 'items',
-            align: 'left',
-            format: val => val.length ? i18n.trd(val[0].startDate, { type: 'time' }) : '-'
-          },
-          {
-            name: 'startDate',
-            label: i18n.tr('isite.cms.label.day'),
-            field: 'items',
-            align: 'left',
-            format: val => val.length ? i18n.trd(val[0].startDate, { type: 'dayHuman' }) : '-'
-          },
-          {
-            name: 'estimateTime',
-            label: '(pt) Tiempo Estimado',
-            field: 'items',
-            align: 'left',
-            format: val => '-'
-          },
-          {
-            name: 'spendTime',
-            label: '(pt) Duración',
-            field: 'items',
-            align: 'left',
-            format: val => '-'
-          },
-          {
             name: 'price',
-            label: '(pt) Precio',
+            label: i18n.tr('isite.cms.label.price'),
             field: 'items',
             align: 'left',
             format: val =>
@@ -96,7 +113,74 @@ export default function controller (props: any, emit: any)
           include: 'customer,items.service,items.resource',
           filter: { orderByItemsDate: true }
         },
-        filters: {},
+        filters: {
+          date: {
+            type: 'dateRange',
+            quickFilter: true,
+            props: {
+              label: 'Date',
+              clearable: true,
+              removeTime: true,
+              autoClose: true,
+              field: 'start_date'
+            }
+          },
+          resourceId: {
+            value: [],
+            type: 'select',
+            quickFilter: true,
+            props: {
+              label: i18n.tr('isite.cms.label.resource'),
+              clearable: true,
+              useInput: true,
+              useChips: true,
+              multiple: true
+            },
+            loadOptions: {
+              apiRoute: 'apiRoutes.qbooking.resources'
+            }
+          },
+          serviceId: {
+            value: [],
+            type: 'select',
+            quickFilter: true,
+            props: {
+              label: i18n.tr('isite.cms.label.service'),
+              clearable: true,
+              useInput: true,
+              useChips: true,
+              multiple: true
+            },
+            loadOptions: {
+              apiRoute: 'apiRoutes.qbooking.services'
+            }
+          },
+          customerId: {
+            type: 'select',
+            props: {
+              label: i18n.tr('isite.cms.label.customer'),
+              clearable: true
+            },
+            loadOptions: {
+              apiRoute: 'apiRoutes.quser.users',
+              select: { label: 'fullName', id: 'id' }
+            }
+          },
+          status: {
+            value: [],
+            type: 'select',
+            props: {
+              label: i18n.tr('isite.cms.form.status'),
+              clearable: true,
+              useInput: true,
+              useChips: true,
+              multiple: true
+            },
+            loadOptions: {
+              apiRoute: 'apiRoutes.qbooking.statuses'
+            }
+          }
+        },
         help: {}
       },
       beforeUpdate: ({ val, row }) =>
