@@ -65,6 +65,7 @@ export default function controller (props: any, emit: any)
             dynamicField: row =>
             {
               return {
+                name: 'status',
                 type: 'select',
                 props: {
                   label: i18n.tr('isite.cms.form.status'),
@@ -186,9 +187,6 @@ export default function controller (props: any, emit: any)
           }
         },
         help: {}
-      },
-      beforeUpdate: ({ val, row }) =>
-      {
       }
     }
   });
