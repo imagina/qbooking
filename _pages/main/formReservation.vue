@@ -612,9 +612,12 @@ export default {
     createReservation() {
       return new Promise((resolve, reject) => {
         this.loading = true
+        console.warn(this.selected)
         //Request data
         let requestData = {
           customerId: this.$store.state.quserAuth.userId,
+          startDate: `${this.selected.availability.calendarDate} ${this.selected.availability.startTime}`,
+          endDate: `${this.selected.availability.calendarDate} ${this.selected.availability.endTime}`,
           items: [{
             ...this.serviceForm.fields,
             categoryId: this.selected.category.id,
@@ -623,9 +626,7 @@ export default {
             serviceTitle: this.selected.service.title,
             price: this.selected.service.price,
             resourceId: this.selected.availability.resource.id,
-            resourceTitle: this.selected.availability.resource.title,
-            startDate: `${this.selected.availability.calendarDate} ${this.selected.availability.startTime}`,
-            endDate: `${this.selected.availability.calendarDate} ${this.selected.availability.endTime}`,
+            resourceTitle: this.selected.availability.resource.title
           }]
         }
         //Request
