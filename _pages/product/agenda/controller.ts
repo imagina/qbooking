@@ -1,7 +1,7 @@
 import { computed, reactive, ref, onMounted, toRefs, watch, getCurrentInstance } from 'vue';
 import service from '../agenda/services';
 import store from '../agenda/store';
-import { i18n } from 'src/plugins/utils';
+import { i18n, array } from 'src/plugins/utils';
 import moment from 'moment/moment';
 import colorCell from 'modules/qsite/_components/master/contentType/colorCell.vue';
 
@@ -24,6 +24,9 @@ export default function controller (props: any, emit: any)
         title: i18n.tr('isite.cms.new')
       },
       read: {
+        tableProps: {
+          dense: true
+        },
         title: i18n.tr('ibooking.cms.sidebar.panelReservations'),
         columns: [
           {
@@ -54,19 +57,20 @@ export default function controller (props: any, emit: any)
             format: val => val ? `${val.firstName} ${val.lastName}` : '-'
           },
           {
-            name: 'status',
+            name: 'statusModel',
             label: i18n.tr('isite.cms.form.status'),
             field: 'statusModel',
             style: 'padding: 0px 5px',
-            format: val => val.title,
-            dynamicField: {
-              type: 'select',
-              props: {
-                label: i18n.tr('isite.cms.form.status')
-              },
-              loadOptions: {
-                apiRoute: 'apiRoutes.qbooking.statuses'
-              }
+            component: colorCell,
+            dynamicField: row =>
+            {
+              return {
+                type: 'select',
+                props: {
+                  label: i18n.tr('isite.cms.form.status'),
+                  options: array.select(row.statusModel?.nextStatus ?? [])
+                }
+              };
             }
           },
           {

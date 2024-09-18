@@ -612,7 +612,6 @@ export default {
     createReservation() {
       return new Promise((resolve, reject) => {
         this.loading = true
-        console.warn(this.selected)
         //Request data
         let requestData = {
           customerId: this.$store.state.quserAuth.userId,
