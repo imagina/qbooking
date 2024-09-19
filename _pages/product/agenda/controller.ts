@@ -20,8 +20,8 @@ export default function controller (props: any, emit: any)
       apiRoute: 'apiRoutes.qbooking.reservations',
       permission: 'ibooking.reservations',
       search: true,
-      create: {
-        title: i18n.tr('isite.cms.new')
+      pageActions: {
+        extraActions: ['search', 'new']
       },
       read: {
         tableProps: {
