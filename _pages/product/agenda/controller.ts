@@ -69,7 +69,10 @@ export default function controller (props: any, emit: any)
                 type: 'select',
                 props: {
                   label: i18n.tr('isite.cms.form.status'),
-                  options: array.select(row.statusModel?.nextStatus ?? [])
+                  options: [
+                    { label: row.statusModel.title, value: row.statusModel.id },
+                    ...array.select(row.statusModel?.nextStatus ?? [])
+                  ]
                 }
               };
             }
@@ -116,7 +119,7 @@ export default function controller (props: any, emit: any)
         ],
         requestParams: {
           include: 'customer,items.service,items.resource',
-          filter: { orderByItemsDate: true }
+          order: { field: 'start_date', way: 'asc' }
         },
         filters: {
           date: {
@@ -184,7 +187,22 @@ export default function controller (props: any, emit: any)
             loadOptions: {
               apiRoute: 'apiRoutes.qbooking.statuses'
             }
-          }
+          },
+          categoryId: {
+            value: [],
+            type: 'select',
+            quickFilter: true,
+            props: {
+              label: i18n.tr('isite.cms.form.category'),
+              clearable: true,
+              useInput: true,
+              useChips: true,
+              multiple: true
+            },
+            loadOptions: {
+              apiRoute: 'apiRoutes.qbooking.categories'
+            }
+          },
         },
         help: {}
       }
