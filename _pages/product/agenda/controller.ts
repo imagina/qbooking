@@ -11,7 +11,7 @@ export default function controller (props: any, emit: any)
 
   // Refs
   const refs = {
-    // refKey: ref(defaultValue)
+    dynamicListComponent: ref()
   };
 
   // States
@@ -202,11 +202,12 @@ export default function controller (props: any, emit: any)
             loadOptions: {
               apiRoute: 'apiRoutes.qbooking.categories'
             }
-          },
+          }
         },
         help: {}
       }
-    }
+    },
+    showBookingForm: false
   });
 
   // Computed
@@ -216,7 +217,11 @@ export default function controller (props: any, emit: any)
 
   // Methods
   const methods = {
-    // methodKey: () => {}
+    reservationCreated: () =>
+    {
+      state.showBookingForm = false;
+      refs.dynamicListComponent.value.getData({ page: 1 }, true);
+    }
   };
 
   // Mounted
