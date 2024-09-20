@@ -2,8 +2,7 @@ import { computed, reactive, ref, onMounted, toRefs, watch, getCurrentInstance }
 import service from '../agenda/services';
 import store from '../agenda/store';
 import { i18n, array } from 'src/plugins/utils';
-import moment from 'moment/moment';
-import colorCell from 'modules/qsite/_components/master/contentType/colorCell.vue';
+
 
 export default function controller (props: any, emit: any)
 {
@@ -61,7 +60,16 @@ export default function controller (props: any, emit: any)
             label: i18n.tr('isite.cms.form.status'),
             field: 'statusModel',
             style: 'padding: 0px 5px',
-            component: colorCell,
+            contentType: (row) => {
+              return {
+                template: 'colorCell',
+                props: {
+                  label: row.statusModel.title,
+                  color: row.statusModel.color,
+                  icon: row.statusModel.icon
+                }
+              }
+            } ,
             dynamicField: row =>
             {
               return {
