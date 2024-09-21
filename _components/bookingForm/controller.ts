@@ -1,7 +1,7 @@
 import { computed, reactive, ref, onMounted, toRefs, watch, getCurrentInstance } from 'vue';
 import service from 'modules/qbooking/_components/bookingForm/services';
 import store from 'modules/qbooking/_components/bookingForm/store';
-import { i18n, alert } from 'src/plugins/utils';
+import { i18n, alert, moment } from 'src/plugins/utils';
 
 export default function controller (props: any, emit: any)
 {
@@ -53,7 +53,18 @@ export default function controller (props: any, emit: any)
       categoryId: null,
       serviceId: [],
       resourceId: null,
+      date: moment().format('YYYY/MM/DD'),
       availabilityId: null
+    },
+    dynamicFields: {
+      availabilityDate: {
+        value: null,
+        type: 'date',
+        props: {
+          label: i18n.tr('isite.cms.label.date'),
+          hintAsHuman: true
+        }
+      }
     }
   });
 
@@ -111,7 +122,15 @@ export default function controller (props: any, emit: any)
         const index = state.selected[stateName].indexOf(value);
         if (index === -1) state.selected[stateName].push(value);
         else state.selected[stateName].splice(index, 1);
-      } else state.selected[stateName] = value;
+      } else
+      {
+        //Validate if step is not required, then allow unselec item
+        if (state.selected[stateName] == value)
+        {
+          const step = state.steps.find(item => item.value == state.step);
+          if (!step.required) state.selected[stateName] = null;
+        } else state.selected[stateName] = value;//Put the select item
+      }
     },
 
     // Validate if item (category,service,resource) is selected
@@ -144,8 +163,15 @@ export default function controller (props: any, emit: any)
           });
           break;
         case'resource':
+        case'availability':
           methods.getData('getAvailabilities', 'availabilities', {
-            refresh: true, params: { filter: state.selected }
+            refresh: true, params: {
+              filter: {
+                ...state.selected,
+                // Change this for get shifts of a specific date
+                date: [state.selected.date, state.selected.date]
+              }
+            }
           });
           break;
       }
@@ -203,7 +229,6 @@ export default function controller (props: any, emit: any)
         emit('created');
       }).catch(error =>
       {
-        console.warn(error)
         alert.error({ message: `${i18n.tr('isite.cms.message.recordNoCreated')}` });
         state.loading = false;
       });

@@ -75,26 +75,23 @@
           </q-tab-panel>
           <!--availability-->
           <q-tab-panel name="availability">
+            <!-- Filter Date -->
+            <div class="full-width">
+              <dynamic-field v-model="selected.date" :field="dynamicFields.availabilityDate"
+                             @update:modelValue="nextStep" />
+              <q-separator class="q-my-md" />
+            </div>
             <!--Not result-->
             <div v-if="!availabilities.length" class="q-mt-md">
               <not-result />
             </div>
             <!--Availabilities-->
-            <div v-else class="row q-col-gutter-sm">
+            <div v-else class="row q-gutter-sm">
+              <!--Availabilities-->
               <template v-for="(availability, keyService) in availabilities" :key="keyService">
-                <div class="col-12" v-if="!availability.isBusy"
+                <div :class="`chip-selectable ${isValueSelected('availabilityId',availability.id)}`"
                      @click="selectItem('availabilityId', availability.id)">
-                  <div :class="`item-selectable row items-center ${isValueSelected('availabilityId',availability.id)}`">
-                    <!--Icon-->
-                    <q-icon name="fas fa-chess-knight" />
-                    <!--Description-->
-                    <div class="text-left">
-                      <!--Shifts date-->
-                      <div class="text-blue">
-                        {{ $trd(`${availability.calendarDate} ${availability.startTime}`, { type: 'shortHuman' }) }}
-                      </div>
-                    </div>
-                  </div>
+                  {{ $trd(`${availability.calendarDate} ${availability.startTime}`, { type: 'time' }) }}
                 </div>
               </template>
             </div>
@@ -155,7 +152,8 @@
             <div class="text-primary row justify-between">
               (pt) Availability
             </div>
-            {{ !selectedInformation.availability ? '-' : $trd(`${selectedInformation.availability.calendarDate} ${selectedInformation.availability.startTime}`, { type: 'shortHuman' }) }}
+            {{ !selectedInformation.availability ? '-' : $trd(`${selectedInformation.availability.calendarDate} ${selectedInformation.availability.startTime}`, { type: 'shortHuman' })
+            }}
           </div>
 
           <!--Actions-->
@@ -222,6 +220,18 @@ export default defineComponent({
     label {
       color: $grey-9;
       cursor: pointer;
+    }
+  }
+
+  .chip-selectable {
+    cursor: pointer;
+    border: 2px solid $grey-4;
+    border-radius: $custom-radius;
+    color: $grey-9;
+    padding: 5px 10px;
+
+    &.selected {
+      border: 2px solid $primary;
     }
   }
 
