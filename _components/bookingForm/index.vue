@@ -76,7 +76,22 @@
           <!--availability-->
           <q-tab-panel name="availability">
             <calendar :split-days="resourcesByDay" :events="events"
-                      @update-date="newDate => {selected.date = newDate; nextStep()}" />
+                      @update-date="newDate => {selected.date = newDate; nextStep()}"
+                      @openModal="val => openModal(val)"
+            />
+
+            <master-modal
+              v-model="modal.show"
+              title="New event"
+              @hide="modal.show = false"
+              :actions="modal.actions"
+            >
+              <div class="row">
+                <div v-for="(field, keyField) in modal.dynamicFields" :key="keyField" class="col-12">
+                    <dynamic-field v-model="formEvent[keyField]" class="q-mb-md" :field="field"/>
+                </div>
+              </div>
+            </master-modal>
           </q-tab-panel>
         </q-tab-panels>
       </div>

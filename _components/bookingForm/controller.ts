@@ -49,6 +49,63 @@ export default function controller (props: any, emit: any)
     services: [],
     resources: [],
     reservations: [],
+    newEvent: null,
+    formEvent: {},
+    modal: {
+      show: false,
+      actions: [
+        {
+          props: {
+            label: 'save',
+            color: 'primary'
+          },
+          action: () => {
+            state.modal.show = false;
+            methods.addNewEvent()
+          }
+        }
+      ],
+      dynamicFields: {
+        startDate: {
+          value: null,
+          type: 'hour',
+          props: {
+            label: i18n.tr('isite.cms.label.date'),
+            hintAsHuman: true
+          }
+        },
+        endDate: {
+          value: null,
+          type: 'hour',
+          props: {
+            label: i18n.tr('isite.cms.label.date'),
+            hintAsHuman: true
+          }
+        },
+        customer: {
+          value: null,
+          type: "crud",
+          permission: 'profile.user.index',
+          props: {
+            crudType: "select",
+            crudData: import("modules/quser/_crud/users"),
+            crudProps: {
+              label: i18n.tr('isite.cms.form.customer'),
+              rules: [
+                (val) => !!val || i18n.tr("isite.cms.message.fieldRequired"),
+              ],
+            },
+            config: {
+              filterByQuery: true,
+              options: {
+                label: "fullName",
+                value: "id",
+              },
+            },
+          },
+        },
+      }
+    },
     availabilities: [],
     selected: {
       categoryId: null,
@@ -104,15 +161,21 @@ export default function controller (props: any, emit: any)
     }),
     events: computed(() =>
     {
-      return state.reservations.map(item => ({
+      const events =  state.reservations.map(item => ({
         start: item.startDate,
         end: item.endDate,
         title: item.customer? `${item.customer.firstName} ${item.customer.lastName}` : '-',
         content: item.items.map(item => item.service.title).join(','),
         class: '',
         split: item?.split || item.resourceId
-      }));
-    })
+      }))
+      if(state.newEvent) events.push(state.newEvent)
+      return events
+    }),
+    reservationContent: computed(() => computeds.selectedInformation.value.services.map(item => item.title).join(', ')),
+    reservationTime: computed(() => computeds.selectedInformation.value.services.reduce(( sum, { shiftTime } ) => sum + shiftTime, 0))
+
+
   };
 
   // Methods
@@ -180,6 +243,7 @@ export default function controller (props: any, emit: any)
           break;
         case'resource':
         case'availability':
+          //state.newEvent = null
           methods.getData('getReservations', 'reservations', {
             refresh: true, params: {
               include: 'customer,items.service',
@@ -254,19 +318,31 @@ export default function controller (props: any, emit: any)
       });
     },
 
-    openModal (item)
-    {
-      const addTime = computeds.selectedInformation.value.services[0].shiftTime;
-      let endDate = new Date(item.date).format('YYYY-MM-DD HH:mm');
-      endDate = new Date(item.date).addMinutes(addTime);
-      state.reservations.push({
-        startDate: new Date(item.date).format('YYYY-MM-DD HH:mm'),
-        endDate: endDate.format('YYYY-MM-DD HH:mm'),
-        title: 'added from modal',
-        content: 'Click to see my shopping list',
+    addNewEvent(){
+      const startDate = moment(`${state.selected.date} ${state.formEvent.startDate}`).format('YYYY-MM-DD HH:mm')
+      const endDate = moment(`${state.selected.date} ${state.formEvent.endDate}`).format('YYYY-MM-DD HH:mm')
+      const title = state.formEvent.customer
+
+      state.newEvent = {
+        start: startDate,
+        end: endDate,
+        title: title,
+        content: computeds.reservationContent.value,
         class: '',
-        split: item.split
-      });
+        split: state.formEvent.split
+      }
+    },
+    openModal (item){
+      let date = moment(item.date).format('YYYY-MM-DD HH:mm')
+      const minutes = moment(date).minutes()
+      //set minutes
+      date = moment(date).set('minute', (minutes >= 30 ? 30 : 0))
+      const endDate = moment(date).add(computeds.reservationTime.value, 'minutes')
+
+      state.formEvent.startDate = moment(date).format('HH:mm')
+      state.formEvent.endDate = moment(endDate).format('HH:mm')
+      state.formEvent.split = item.split
+      state.modal.show = true
     }
   };
 
