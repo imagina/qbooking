@@ -66,19 +66,6 @@ export default function controller (props: any, emit: any)
           hintAsHuman: true
         }
       }
-    },
-    vueCalcConfig: {
-      ['time-from']: 8 * 60, //start of the day      
-      ['time-to']: 20 * 60, //end of the day
-      ['active-view']: 'day',
-      ['disable-views']: ['years', 'year', 'month', 'week'], 
-      ['editable-events']: { 
-        title: false, 
-        drag: true, 
-        resize: false, 
-        delete: true, 
-        create: true 
-      }
     }
   });
 
@@ -110,20 +97,22 @@ export default function controller (props: any, emit: any)
       }
       //Default response
       return true;
-    }), 
-    resourcesByDay: computed(() => { 
-      return state.resources.map(item => ({ id: item.id, label: item.title, class: '' } ))
-    }), 
-    events: computed(() => {
-      return state.reservations.map(item => ({ 
-        start: item.startDate, 
-        end: item.endDate,  
-        title: item?.title || 'test',
-        content: item?.content || 'Click to see my shopping list', 
-        class: '', 
-        split: item?.split || item.items[0].resourceId
-      } ))
     }),
+    resourcesByDay: computed(() =>
+    {
+      return state.resources.map(item => ({ id: item.id, label: item.title, class: '' }));
+    }),
+    events: computed(() =>
+    {
+      return state.reservations.map(item => ({
+        start: item.startDate,
+        end: item.endDate,
+        title: item.customer? `${item.customer.firstName} ${item.customer.lastName}` : '-',
+        content: item.items.map(item => item.service.title).join(','),
+        class: '',
+        split: item?.split || item.resourceId
+      }));
+    })
   };
 
   // Methods
@@ -191,30 +180,20 @@ export default function controller (props: any, emit: any)
           break;
         case'resource':
         case'availability':
-          methods.getData('getAvailabilities', 'availabilities', {
-            refresh: true, params: {
-              filter: {
-                ...state.selected,
-                // Change this for get shifts of a specific date
-                date: [state.selected.date, state.selected.date]
-              }
-            }
-          });          
-          
           methods.getData('getReservations', 'reservations', {
             refresh: true, params: {
-              include: 'items,customer',
+              include: 'customer,items.service',
               filter: {
-                resourceId: state.selected.resourceId, 
+                resourceId: state.selected.resourceId,
                 date: {
-                  field: 'start_date', 
-                  from: state.selected.date, 
-                  to: state.selected.date,
+                  field: 'start_date',
+                  from: state.selected.date,
+                  to: state.selected.date
                 }
               }
             }
           });
-          break;          
+          break;
       }
       //Next step
       if (state.step != 'availability') refs.stepsForm.value.next();
@@ -273,19 +252,21 @@ export default function controller (props: any, emit: any)
         alert.error({ message: `${i18n.tr('isite.cms.message.recordNoCreated')}` });
         state.loading = false;
       });
-    }, 
-    openModal(item){
-      const addTime = computeds.selectedInformation.value.services[0].shiftTime
-      let endDate = new Date(item.date).format('YYYY-MM-DD HH:mm')
-      endDate = new Date(item.date).addMinutes(addTime)
+    },
+
+    openModal (item)
+    {
+      const addTime = computeds.selectedInformation.value.services[0].shiftTime;
+      let endDate = new Date(item.date).format('YYYY-MM-DD HH:mm');
+      endDate = new Date(item.date).addMinutes(addTime);
       state.reservations.push({
-        startDate: new Date(item.date).format('YYYY-MM-DD HH:mm'), 
-        endDate: endDate.format('YYYY-MM-DD HH:mm'),  
+        startDate: new Date(item.date).format('YYYY-MM-DD HH:mm'),
+        endDate: endDate.format('YYYY-MM-DD HH:mm'),
         title: 'added from modal',
-        content: 'Click to see my shopping list', 
-        class: '', 
+        content: 'Click to see my shopping list',
+        class: '',
         split: item.split
-      })      
+      });
     }
   };
 

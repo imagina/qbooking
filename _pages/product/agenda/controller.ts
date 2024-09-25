@@ -37,9 +37,9 @@ export default function controller (props: any, emit: any)
           {
             name: 'resource',
             label: i18n.tr('isite.cms.label.resource'),
-            field: 'items',
+            field: 'resource',
             align: 'left',
-            format: val => val.length ? val[0].resource.title : '-'
+            format: val => val?.title ?? '-'
           },
           {
             name: 'service',
@@ -126,7 +126,7 @@ export default function controller (props: any, emit: any)
           }
         ],
         requestParams: {
-          include: 'customer,items.service,items.resource',
+          include: 'customer,items.service,resource',
           order: { field: 'start_date', way: 'asc' }
         },
         filters: {
