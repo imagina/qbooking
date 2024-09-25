@@ -48,6 +48,7 @@ export default function controller (props: any, emit: any)
     categories: [],
     services: [],
     resources: [],
+    reservations: [],
     availabilities: [],
     selected: {
       categoryId: null,
@@ -64,6 +65,19 @@ export default function controller (props: any, emit: any)
           label: i18n.tr('isite.cms.label.date'),
           hintAsHuman: true
         }
+      }
+    },
+    vueCalcConfig: {
+      ['time-from']: 8 * 60, //start of the day      
+      ['time-to']: 20 * 60, //end of the day
+      ['active-view']: 'day',
+      ['disable-views']: ['years', 'year', 'month', 'week'], 
+      ['editable-events']: { 
+        title: false, 
+        drag: true, 
+        resize: false, 
+        delete: true, 
+        create: true 
       }
     }
   });
@@ -96,7 +110,20 @@ export default function controller (props: any, emit: any)
       }
       //Default response
       return true;
-    })
+    }), 
+    resourcesByDay: computed(() => { 
+      return state.resources.map(item => ({ id: item.id, label: item.title, class: '' } ))
+    }), 
+    events: computed(() => {
+      return state.reservations.map(item => ({ 
+        start: item.startDate, 
+        end: item.endDate,  
+        title: item?.title || 'test',
+        content: item?.content || 'Click to see my shopping list', 
+        class: '', 
+        split: item?.split || item.items[0].resourceId
+      } ))
+    }),
   };
 
   // Methods
@@ -172,8 +199,22 @@ export default function controller (props: any, emit: any)
                 date: [state.selected.date, state.selected.date]
               }
             }
+          });          
+          
+          methods.getData('getReservations', 'reservations', {
+            refresh: true, params: {
+              include: 'items,customer',
+              filter: {
+                resourceId: state.selected.resourceId, 
+                date: {
+                  field: 'start_date', 
+                  from: state.selected.date, 
+                  to: state.selected.date,
+                }
+              }
+            }
           });
-          break;
+          break;          
       }
       //Next step
       if (state.step != 'availability') refs.stepsForm.value.next();
@@ -232,6 +273,19 @@ export default function controller (props: any, emit: any)
         alert.error({ message: `${i18n.tr('isite.cms.message.recordNoCreated')}` });
         state.loading = false;
       });
+    }, 
+    openModal(item){
+      const addTime = computeds.selectedInformation.value.services[0].shiftTime
+      let endDate = new Date(item.date).format('YYYY-MM-DD HH:mm')
+      endDate = new Date(item.date).addMinutes(addTime)
+      state.reservations.push({
+        startDate: new Date(item.date).format('YYYY-MM-DD HH:mm'), 
+        endDate: endDate.format('YYYY-MM-DD HH:mm'),  
+        title: 'added from modal',
+        content: 'Click to see my shopping list', 
+        class: '', 
+        split: item.split
+      })      
     }
   };
 
