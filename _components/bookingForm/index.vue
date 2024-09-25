@@ -80,7 +80,7 @@
               <dynamic-field v-model="selected.date" :field="dynamicFields.availabilityDate"
                              @update:modelValue="nextStep" />
               <q-separator class="q-my-md" />
-            </div>
+            </div>            
             <!--Not result-->
             <div v-if="!availabilities.length" class="q-mt-md">
               <not-result />
@@ -94,6 +94,19 @@
                   {{ $trd(`${availability.calendarDate} ${availability.startTime}`, { type: 'time' }) }}
                 </div>
               </template>
+            </div>
+            <!-- calendar -->
+            <div>
+              <vue-cal
+                style="height: 600px"
+                v-bind="vueCalcConfig"
+                :selected-date="selected.date"
+                :split-days="resourcesByDay"
+                :events="events"
+                stickySplitLabels
+                @event-change="(val) => {console.log(val)}"
+                @cell-click="(val) => openModal(val)"
+              />
             </div>
           </q-tab-panel>
         </q-tab-panels>
@@ -177,10 +190,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import controller from 'modules/qbooking/_components/bookingForm/controller';
+import VueCal from 'vue-cal'
+import 'vue-cal/dist/vuecal.css'
 
 export default defineComponent({
   props: {},
-  components: {},
+  components: { VueCal},
   setup (props, { emit })
   {
     return controller(props, emit);

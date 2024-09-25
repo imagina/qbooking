@@ -64,5 +64,15 @@ export default {
       baseService.create('apiRoutes.qbooking.reservations', data)
         .then(response => resolve(response)).catch(error => reject(error));
     });
-  }
+  }, 
+  getReservations (refresh = false, params = {}): Promise<any>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const requestParams = { refresh, params };
+      //Request
+      baseService.index('apiRoutes.qbooking.reservations', requestParams)
+        .then(response => resolve(response)).catch(error => reject(error));
+    });
+  },
 };
