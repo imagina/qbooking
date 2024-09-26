@@ -7,6 +7,10 @@ export default function controller (props: any, emit: any)
 {
   const proxy = getCurrentInstance()!.appContext.config.globalProperties;
 
+
+  const hourOptions = Array.from({length: 13}, (_, index) => index + 8) //from 8h to 20h 
+  const minuteOptions = [ 0, 15, 30, 45 ];
+
   // Refs
   const refs = {
     stepsForm: ref()
@@ -57,19 +61,31 @@ export default function controller (props: any, emit: any)
         startDate: {
           value: null,
           type: 'hour',
-          class: 'col-4',
+          class: 'col-6',
           props: {
             label: i18n.tr('isite.cms.form.startDate'),
-            hintAsHuman: true
+            hourOptions,
+            minuteOptions,
+            rules: [
+              (val) => !!val || i18n.tr("isite.cms.message.fieldRequired"),
+              (val) => (!!val && (parseInt(val.split(':')[0]) >= hourOptions[0] && parseInt(val.split(':')[0]) <= hourOptions[hourOptions.length -1]) )  || `hour should between: 8 - 20`,
+              (val) => (!!val && minuteOptions.includes(parseInt(val.split(':')[1]))) || `minutes should be: ${minuteOptions}`
+            ],
           }
         },
         endDate: {
           value: null,
           type: 'hour',
-          class: 'col-4',
+          class: 'col-6',
           props: {
             label: i18n.tr('isite.cms.form.endDate'),
-            hintAsHuman: true
+            hourOptions,
+            minuteOptions,
+            rules: [
+              (val) => !!val || i18n.tr("isite.cms.message.fieldRequired"),
+              (val) => (!!val && (parseInt(val.split(':')[0]) >= hourOptions[0] && parseInt(val.split(':')[0]) <= hourOptions[hourOptions.length -1]) )  || `hour should between: 8 - 20`,
+              (val) => (!!val && minuteOptions.includes(parseInt(val.split(':')[1]))) || `minutes should be: ${minuteOptions}`
+            ],
           }
         },
         customerId: {
@@ -165,15 +181,16 @@ export default function controller (props: any, emit: any)
       if(state.newEvent) events.push(state.newEvent)
       return events
     }),
-    reservationContent: computed(() => computeds.selectedInformation.value.services.map(item => item.title).join(', ')),
-    reservationTime: computed(() => computeds.selectedInformation.value.services.reduce(( sum, { shiftTime } ) => sum + shiftTime, 0)),
-    reservationIsReady: computed(() => {
-      return state.newEvent?.start && state.newEvent?.end && state.selected?.resourceId && state.formEvent?.customerId
-    }),     
-    selectedResource: computed(() => {
-      if(!state.selected?.resourceId) return false
-      return state.resources.find(item => item.id == state.selected.resourceId)
-    })    
+    
+    reservation: computed(() => {
+      const customer = state.formEvent?.customerId ? state.customers.find(item => item.id == state.formEvent.customerId) : false
+      const title = customer ? `${customer?.firstName} ${customer?.lastName}` : '-'
+      const resource = state.resources.find(item => item.id == state.formEvent.split)
+      const content = computeds.selectedInformation.value.services.map(item => item.title).join(', ')
+      const time = computeds.selectedInformation.value.services.reduce(( sum, { shiftTime } ) => sum + shiftTime, 0)
+      const isReady = state.newEvent?.start && state.newEvent?.end && state.selected?.resourceId && state.formEvent?.customerId
+      return {title, resource, content, time, isReady}
+    }),
     
   };
 
@@ -242,7 +259,7 @@ export default function controller (props: any, emit: any)
           break;
         case'resource':
         case'availability':
-          //state.newEvent = null
+          state.newEvent = null
           methods.getData('getReservations', 'reservations', {
             refresh: true, params: {
               include: 'customer,items.service',
@@ -271,13 +288,16 @@ export default function controller (props: any, emit: any)
           state.selected.serviceId = [];
           state.selected.resourceId = null;
           state.selected.availabilityId = null;
+          state.newEvent = null
           break;
         case'service':
           state.selected.resourceId = null;
           state.selected.availabilityId = null;
+          state.newEvent = null
           break;
         case'resource':
           state.selected.availabilityId = null;
+          state.newEvent = null
           break;
       }
       //Next step
@@ -295,18 +315,20 @@ export default function controller (props: any, emit: any)
         startDate: state.newEvent.start,
         endDate: state.newEvent.end,
         customerId: state.formEvent.customerId,
-        //resourceId: state.selected.resourceId,
-        //resourceTitle: computeds.selectedResource.value.title,
+        //resourceId: computeds.selectedInformation.value.resource.title,
+        //resourceTitle: computeds.selectedInformation.value.resource.title
         items: computeds.selectedInformation.value.services.map(item => ({
           serviceId: item.id,
           serviceTitle: item.title,
           categoryId: item.category.id,
           categoryTitle: item.category.title,
           price: item.price,
-          resourceId: state.selected.resourceId,
-          resourceTitle: computeds.selectedResource.value.title
+          resourceId: computeds.selectedInformation.value.resource.id,
+          resourceTitle: computeds.selectedInformation.value.resource.title
         }))
       };
+      console.log(reservationData)
+      return
       //Request
       service.createReservation(reservationData).then(response =>
       {
@@ -321,28 +343,35 @@ export default function controller (props: any, emit: any)
     },
 
     addNewEvent(){
-      const startDate = moment(`${state.selected.date} ${state.formEvent.startDate}`).format('YYYY-MM-DD HH:mm')
-      const endDate = moment(`${state.selected.date} ${state.formEvent.endDate}`).format('YYYY-MM-DD HH:mm')
-      const customer = state.customers.find(item => item.id == state.formEvent.customerId) || false
-      const title = customer ? `${customer?.firstName} ${customer?.lastName}` : '-';     
-      
+      const selectedDate = moment(new Date(state.selected.date)).format('YYYY/MM/DD')
+      const startDate = moment(`${selectedDate} ${state.formEvent.startDate}`).format('YYYY/MM/DD HH:mm')
+      const endDate = moment(`${selectedDate} ${state.formEvent.endDate}`).format('YYYY/MM/DD HH:mm')
       state.selected.resourceId = state.formEvent.split 
       state.newEvent = {
         start: startDate,
         end: endDate,
-        title: title,
-        content: computeds.reservationContent.value,
+        title: computeds.reservation.value.title,
+        content: computeds.reservation.value.content,
         class: '',
         split: state.formEvent.split 
       }
     },
+    updateNewEvent({event, originalEvent}){
+      //update resource
+      state.formEvent.split = event.split
+      state.selected.resourceId = event.split
+      state.newEvent.split = event.split
+      //update the date
+      state.newEvent.start = moment(event.start).format('YYYY/MM/DD HH:mm')
+      state.newEvent.end = moment(event.end).format('YYYY/MM/DD HH:mm')
+    },
     openModal (item){
       if(item){      
-        let date = moment(item.date).format('YYYY-MM-DD HH:mm')
+        let date = moment(item.date).format('YYYY/MM/DD HH:mm')
         const minutes = moment(date).minutes()
         //set minutes
         date = moment(date).set('minute', (minutes >= 30 ? 30 : 0))
-        const endDate = moment(date).add(computeds.reservationTime.value, 'minutes')
+        const endDate = moment(date).add(computeds.reservation.value.time, 'minutes')
 
         state.formEvent.startDate = moment(date).format('HH:mm')
         state.formEvent.endDate = moment(endDate).format('HH:mm')
