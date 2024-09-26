@@ -7,6 +7,8 @@
       :split-days="splitDays"
       @event-change="(val) => {console.log(val)}"
       @view-change="(event) => selectedDate = $moment(event.startDate).format('YYYY/MM/DD')"
+      @cell-click="(val) => $emit('openModal', val)"
+      @event-click="(val) => $emit('openModal', false)"
     >
       <!-- Custom title -->
       <template #title="{ title, view }">
@@ -28,10 +30,10 @@
 <script>
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
-import { moment } from '../../../../plugins/utils';
+import moment from 'moment';
 
 export default {
-  emits: ['updateDate'],
+  emits: ['updateDate', 'openModal'],
   props: {
     splitDays: { type: Array },
     events: { type: Array, default: () => ([]) }
@@ -60,7 +62,7 @@ export default {
         'disable-views': ['years', 'year', 'month', 'week'],
         'editable-events': {
           title: false,
-          drag: true,
+          drag: false,
           resize: false,
           delete: true,
           create: true

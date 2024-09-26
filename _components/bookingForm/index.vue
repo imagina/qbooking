@@ -76,7 +76,40 @@
           <!--availability-->
           <q-tab-panel name="availability">
             <calendar :split-days="resourcesByDay" :events="events"
-                      @update-date="newDate => {selected.date = newDate; nextStep()}" />
+                      @update-date="newDate => {selected.date = newDate; nextStep()}"
+                      @openModal="val => openModal(val)"
+            />
+
+            <master-modal
+              v-model="modal.show"
+              :title="$tr('ibooking.cms.newReservation')"
+              @hide="modal.show = false"
+              :actions="modal.actions"
+            >
+              <q-form
+                autocorrect="off"
+                autocomplete="off"
+                ref="formContent"
+                @submit="() => {
+                  modal.show = false
+                  addNewEvent()
+                }"
+                @validation-error="$alert.error($tr('isite.cms.message.formInvalid'))"
+              >
+                <div class="row">
+                  <div v-for="(field, keyField) in modal.dynamicFields" :key="keyField" :class="field.class">
+                      <dynamic-field v-model="formEvent[keyField]" class="q-mx-sm" :field="field"/>
+                  </div>
+                </div>
+                <div class="row justify-end">
+                  <q-btn
+                    :label="$tr('isite.cms.label.save')" color="primary"
+                    no-caps unelevated rounded
+                    @click="$refs.formContent.submit()"
+                  />
+                </div>
+              </q-form>
+            </master-modal>
           </q-tab-panel>
         </q-tab-panels>
       </div>
@@ -146,7 +179,7 @@
                    @click="nextStep" v-if="step != 'availability'" />
             <!--Book step-->
             <q-btn color="green" unelevated rounded label="(pt) Reservar"
-                   class="full-width" v-if="selected.availabilityId"
+                   class="full-width" v-if="reservationIsReady"
                    @click="createReservation" />
           </div>
         </div>
