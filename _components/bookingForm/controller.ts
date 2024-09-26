@@ -53,44 +53,35 @@ export default function controller (props: any, emit: any)
     formEvent: {},
     modal: {
       show: false,
-      actions: [
-        {
-          props: {
-            label: 'save',
-            color: 'primary'
-          },
-          action: () => {
-            state.modal.show = false;
-            methods.addNewEvent()
-          }
-        }
-      ],
       dynamicFields: {
         startDate: {
           value: null,
           type: 'hour',
+          class: 'col-4',
           props: {
-            label: i18n.tr('isite.cms.label.date'),
+            label: i18n.tr('isite.cms.form.startDate'),
             hintAsHuman: true
           }
         },
         endDate: {
           value: null,
           type: 'hour',
+          class: 'col-4',
           props: {
-            label: i18n.tr('isite.cms.label.date'),
+            label: i18n.tr('isite.cms.form.endDate'),
             hintAsHuman: true
           }
         },
-        customer: {
+        customerId: {
           value: null,
+          class: 'col-6',
           type: "crud",
           permission: 'profile.user.index',
           props: {
             crudType: "select",
             crudData: import("modules/quser/_crud/users"),
             crudProps: {
-              label: i18n.tr('isite.cms.form.customer'),
+              label: i18n.tr('isite.cms.label.customer'),
               rules: [
                 (val) => !!val || i18n.tr("isite.cms.message.fieldRequired"),
               ],
@@ -101,6 +92,7 @@ export default function controller (props: any, emit: any)
                 label: "fullName",
                 value: "id",
               },
+              loadedOptions: (data) => state.customers = data
             },
           },
         },
@@ -123,7 +115,8 @@ export default function controller (props: any, emit: any)
           hintAsHuman: true
         }
       }
-    }
+    }, 
+    customers: [] //store the loaded customers
   });
 
   // Computed
@@ -167,15 +160,21 @@ export default function controller (props: any, emit: any)
         title: item.customer? `${item.customer.firstName} ${item.customer.lastName}` : '-',
         content: item.items.map(item => item.service.title).join(','),
         class: '',
-        split: item?.split || item.resourceId
+        split: item.resourceId
       }))
       if(state.newEvent) events.push(state.newEvent)
       return events
     }),
     reservationContent: computed(() => computeds.selectedInformation.value.services.map(item => item.title).join(', ')),
-    reservationTime: computed(() => computeds.selectedInformation.value.services.reduce(( sum, { shiftTime } ) => sum + shiftTime, 0))
-
-
+    reservationTime: computed(() => computeds.selectedInformation.value.services.reduce(( sum, { shiftTime } ) => sum + shiftTime, 0)),
+    reservationIsReady: computed(() => {
+      return state.newEvent?.start && state.newEvent?.end && state.selected?.resourceId && state.formEvent?.customerId
+    }),     
+    selectedResource: computed(() => {
+      if(!state.selected?.resourceId) return false
+      return state.resources.find(item => item.id == state.selected.resourceId)
+    })    
+    
   };
 
   // Methods
@@ -289,22 +288,25 @@ export default function controller (props: any, emit: any)
     {
       state.loading = true;
       //Get the availability
-      const availability = computeds.selectedInformation.value.availability;
+      //const availability = computeds.selectedInformation.value.availability;
       //Instance the reservation data
+      
       let reservationData = {
-        startDate: `${availability.calendarDate} ${availability.startTime}`,
-        endDate: `${availability.calendarDate} ${availability.endTime}`,
+        startDate: state.newEvent.start,
+        endDate: state.newEvent.end,
+        customerId: state.formEvent.customerId,
+        //resourceId: state.selected.resourceId,
+        //resourceTitle: computeds.selectedResource.value.title,
         items: computeds.selectedInformation.value.services.map(item => ({
           serviceId: item.id,
           serviceTitle: item.title,
           categoryId: item.category.id,
           categoryTitle: item.category.title,
           price: item.price,
-          resourceId: availability.resource.id,
-          resourceTitle: availability.resource.title
+          resourceId: state.selected.resourceId,
+          resourceTitle: computeds.selectedResource.value.title
         }))
       };
-
       //Request
       service.createReservation(reservationData).then(response =>
       {
@@ -321,27 +323,31 @@ export default function controller (props: any, emit: any)
     addNewEvent(){
       const startDate = moment(`${state.selected.date} ${state.formEvent.startDate}`).format('YYYY-MM-DD HH:mm')
       const endDate = moment(`${state.selected.date} ${state.formEvent.endDate}`).format('YYYY-MM-DD HH:mm')
-      const title = state.formEvent.customer
-
+      const customer = state.customers.find(item => item.id == state.formEvent.customerId) || false
+      const title = customer ? `${customer?.firstName} ${customer?.lastName}` : '-';     
+      
+      state.selected.resourceId = state.formEvent.split 
       state.newEvent = {
         start: startDate,
         end: endDate,
         title: title,
         content: computeds.reservationContent.value,
         class: '',
-        split: state.formEvent.split
+        split: state.formEvent.split 
       }
     },
     openModal (item){
-      let date = moment(item.date).format('YYYY-MM-DD HH:mm')
-      const minutes = moment(date).minutes()
-      //set minutes
-      date = moment(date).set('minute', (minutes >= 30 ? 30 : 0))
-      const endDate = moment(date).add(computeds.reservationTime.value, 'minutes')
+      if(item){      
+        let date = moment(item.date).format('YYYY-MM-DD HH:mm')
+        const minutes = moment(date).minutes()
+        //set minutes
+        date = moment(date).set('minute', (minutes >= 30 ? 30 : 0))
+        const endDate = moment(date).add(computeds.reservationTime.value, 'minutes')
 
-      state.formEvent.startDate = moment(date).format('HH:mm')
-      state.formEvent.endDate = moment(endDate).format('HH:mm')
-      state.formEvent.split = item.split
+        state.formEvent.startDate = moment(date).format('HH:mm')
+        state.formEvent.endDate = moment(endDate).format('HH:mm')
+        state.formEvent.split = item.split        
+      }
       state.modal.show = true
     }
   };

@@ -8,6 +8,7 @@
       @event-change="(val) => {console.log(val)}"
       @view-change="(event) => selectedDate = $moment(event.startDate).format('YYYY/MM/DD')"
       @cell-click="(val) => $emit('openModal', val)"
+      @event-click="(val) => $emit('openModal', false)"
     >
       <!-- Custom title -->
       <template #title="{ title, view }">
