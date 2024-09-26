@@ -1,6 +1,5 @@
 <template>
   <div id="bookingFormCalendar">
-    {{ selectedDate }}
     <vue-cal
       v-bind="vueCalProps"
       :selected-date="selectedDate"

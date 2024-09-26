@@ -73,19 +73,13 @@ export default function controller (props: any, emit: any)
             ],
           }
         },
-        endDate: {
+        endDate: {          
           value: null,
           type: 'hour',
           class: 'col-6',
           props: {
+            disable: true,
             label: i18n.tr('isite.cms.form.endDate'),
-            hourOptions,
-            minuteOptions,
-            rules: [
-              (val) => !!val || i18n.tr("isite.cms.message.fieldRequired"),
-              (val) => (!!val && (parseInt(val.split(':')[0]) >= hourOptions[0] && parseInt(val.split(':')[0]) <= hourOptions[hourOptions.length -1]) )  || `hour should between: 8 - 20`,
-              (val) => (!!val && minuteOptions.includes(parseInt(val.split(':')[1]))) || `minutes should be: ${minuteOptions}`
-            ],
           }
         },
         customerId: {
@@ -327,8 +321,6 @@ export default function controller (props: any, emit: any)
           resourceTitle: computeds.selectedInformation.value.resource.title
         }))
       };
-      console.log(reservationData)
-      return
       //Request
       service.createReservation(reservationData).then(response =>
       {
