@@ -7,10 +7,6 @@ export default function controller (props: any, emit: any)
 {
   const proxy = getCurrentInstance()!.appContext.config.globalProperties;
 
-
-  const hourOptions = Array.from({length: 13}, (_, index) => index + 8) //from 8h to 20h 
-  const minuteOptions = [ 0, 15, 30, 45 ];
-
   // Refs
   const refs = {
     stepsForm: ref()
@@ -54,78 +50,15 @@ export default function controller (props: any, emit: any)
     resources: [],
     reservations: [],
     newEvent: null,
-    formEvent: {},
-    modal: {
-      show: false,
-      dynamicFields: {
-        startDate: {
-          value: null,
-          type: 'hour',
-          class: 'col-6',
-          props: {
-            label: i18n.tr('isite.cms.form.startDate'),
-            hourOptions,
-            minuteOptions,
-            rules: [
-              (val) => !!val || i18n.tr("isite.cms.message.fieldRequired"),
-              (val) => (!!val && (parseInt(val.split(':')[0]) >= hourOptions[0] && parseInt(val.split(':')[0]) <= hourOptions[hourOptions.length -1]) )  || `hour should between: 8 - 20`,
-              (val) => (!!val && minuteOptions.includes(parseInt(val.split(':')[1]))) || `minutes should be: ${minuteOptions}`
-            ],
-          }
-        },
-        endDate: {          
-          value: null,
-          type: 'hour',
-          class: 'col-6',
-          props: {
-            disable: true,
-            label: i18n.tr('isite.cms.form.endDate'),
-          }
-        },
-        customerId: {
-          value: null,
-          class: 'col-6',
-          type: "crud",
-          permission: 'profile.user.index',
-          props: {
-            crudType: "select",
-            crudData: import("modules/quser/_crud/users"),
-            crudProps: {
-              label: i18n.tr('isite.cms.label.customer'),
-              rules: [
-                (val) => !!val || i18n.tr("isite.cms.message.fieldRequired"),
-              ],
-            },
-            config: {
-              filterByQuery: true,
-              options: {
-                label: "fullName",
-                value: "id",
-              },
-              loadedOptions: (data) => state.customers = data
-            },
-          },
-        },
-      }
-    },
-    availabilities: [],
     selected: {
       categoryId: null,
       serviceId: [],
       resourceId: null,
       date: moment().format('YYYY/MM/DD'),
-      availabilityId: null
+      startDate: null,
+      endDate: null,
+      customerId: null
     },
-    dynamicFields: {
-      availabilityDate: {
-        value: null,
-        type: 'date',
-        props: {
-          label: i18n.tr('isite.cms.label.date'),
-          hintAsHuman: true
-        }
-      }
-    }, 
     customers: [] //store the loaded customers
   });
 
@@ -138,9 +71,7 @@ export default function controller (props: any, emit: any)
       services: !state.selected.serviceId ? null :
         state.services.filter(item => state.selected.serviceId.includes(item.id)),
       resource: !state.selected.resourceId ? null :
-        state.resources.find(item => item.id == state.selected.resourceId),
-      availability: !state.selected.availabilityId ? null :
-        state.availabilities.find(item => item.id == state.selected.availabilityId)
+        state.resources.find(item => item.id == state.selected.resourceId)
     })),
     // Validate if current step is allow to continue
     allowNext: computed(() =>
@@ -157,35 +88,7 @@ export default function controller (props: any, emit: any)
       }
       //Default response
       return true;
-    }),
-    resourcesByDay: computed(() =>
-    {
-      return state.resources.map(item => ({ id: item.id, label: item.title, class: '' }));
-    }),
-    events: computed(() =>
-    {
-      const events =  state.reservations.map(item => ({
-        start: item.startDate,
-        end: item.endDate,
-        title: item.customer? `${item.customer.firstName} ${item.customer.lastName}` : '-',
-        content: item.items.map(item => item.service.title).join(','),
-        class: '',
-        split: item.resourceId
-      }))
-      if(state.newEvent) events.push(state.newEvent)
-      return events
-    }),
-    
-    reservation: computed(() => {
-      const customer = state.formEvent?.customerId ? state.customers.find(item => item.id == state.formEvent.customerId) : false
-      const title = customer ? `${customer?.firstName} ${customer?.lastName}` : '-'
-      const resource = state.resources.find(item => item.id == state.formEvent.split)
-      const content = computeds.selectedInformation.value.services.map(item => item.title).join(', ')
-      const time = computeds.selectedInformation.value.services.reduce(( sum, { shiftTime } ) => sum + shiftTime, 0)
-      const isReady = state.newEvent?.start && state.newEvent?.end && state.selected?.resourceId && state.formEvent?.customerId
-      return {title, resource, content, time, isReady}
-    }),
-    
+    })
   };
 
   // Methods
@@ -253,7 +156,7 @@ export default function controller (props: any, emit: any)
           break;
         case'resource':
         case'availability':
-          state.newEvent = null
+          state.newEvent = null;
           methods.getData('getReservations', 'reservations', {
             refresh: true, params: {
               include: 'customer,items.service',
@@ -272,31 +175,6 @@ export default function controller (props: any, emit: any)
       //Next step
       if (state.step != 'availability') refs.stepsForm.value.next();
     },
-    //Edit especific section
-    editSection (section)
-    {
-      //Action by step
-      switch (section)
-      {
-        case'category':
-          state.selected.serviceId = [];
-          state.selected.resourceId = null;
-          state.selected.availabilityId = null;
-          state.newEvent = null
-          break;
-        case'service':
-          state.selected.resourceId = null;
-          state.selected.availabilityId = null;
-          state.newEvent = null
-          break;
-        case'resource':
-          state.selected.availabilityId = null;
-          state.newEvent = null
-          break;
-      }
-      //Next step
-      refs.stepsForm.value.goTo(section);
-    },
     //Create the reservation
     createReservation ()
     {
@@ -304,7 +182,7 @@ export default function controller (props: any, emit: any)
       //Get the availability
       //const availability = computeds.selectedInformation.value.availability;
       //Instance the reservation data
-      
+
       let reservationData = {
         startDate: state.newEvent.start,
         endDate: state.newEvent.end,
@@ -332,44 +210,6 @@ export default function controller (props: any, emit: any)
         alert.error({ message: `${i18n.tr('isite.cms.message.recordNoCreated')}` });
         state.loading = false;
       });
-    },
-
-    addNewEvent(){
-      const selectedDate = moment(new Date(state.selected.date)).format('YYYY/MM/DD')
-      const startDate = moment(`${selectedDate} ${state.formEvent.startDate}`).format('YYYY/MM/DD HH:mm')
-      const endDate = moment(`${selectedDate} ${state.formEvent.endDate}`).format('YYYY/MM/DD HH:mm')
-      state.selected.resourceId = state.formEvent.split 
-      state.newEvent = {
-        start: startDate,
-        end: endDate,
-        title: computeds.reservation.value.title,
-        content: computeds.reservation.value.content,
-        class: '',
-        split: state.formEvent.split 
-      }
-    },
-    updateNewEvent({event, originalEvent}){
-      //update resource
-      state.formEvent.split = event.split
-      state.selected.resourceId = event.split
-      state.newEvent.split = event.split
-      //update the date
-      state.newEvent.start = moment(event.start).format('YYYY/MM/DD HH:mm')
-      state.newEvent.end = moment(event.end).format('YYYY/MM/DD HH:mm')
-    },
-    openModal (item){
-      if(item){      
-        let date = moment(item.date).format('YYYY/MM/DD HH:mm')
-        const minutes = moment(date).minutes()
-        //set minutes
-        date = moment(date).set('minute', (minutes >= 30 ? 30 : 0))
-        const endDate = moment(date).add(computeds.reservation.value.time, 'minutes')
-
-        state.formEvent.startDate = moment(date).format('HH:mm')
-        state.formEvent.endDate = moment(endDate).format('HH:mm')
-        state.formEvent.split = item.split        
-      }
-      state.modal.show = true
     }
   };
 

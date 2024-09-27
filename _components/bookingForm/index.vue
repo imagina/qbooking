@@ -75,127 +75,16 @@
           </q-tab-panel>
           <!--availability-->
           <q-tab-panel name="availability">
-            <calendar :split-days="resourcesByDay" :events="events"
-                      @update-date="newDate => {selected.date = newDate}"
-                      @openModal="val => openModal(val)"
+            <calendar @openModal="val => openModal(val)"
                       @updateEvent="val => updateNewEvent(val)"
             />
-
-            <master-modal
-              v-model="modal.show"
-              :title="$tr('ibooking.cms.newReservation')"
-              @hide="modal.show = false"
-              :actions="modal.actions"
-            >
-              <q-form
-                autocorrect="off"
-                autocomplete="off"
-                ref="formContent"
-                @submit="() => {
-                  modal.show = false
-                  addNewEvent()
-                }"
-                @validation-error="$alert.error($tr('isite.cms.message.formInvalid'))"
-              >
-                <div class="row col-12">
-                Client:  {{ reservation.title }}
-                </div>
-                <div class="row col-12">
-                  Service: {{ reservation.content }}
-                </div>
-                <div class="row col-12">
-                  Duration: {{ reservation.time }}
-                </div>
-                <div class="row col-12">
-                  resource: {{ reservation.resource.title }}
-                </div>
-                <div class="row">
-                  <div v-for="(field, keyField) in modal.dynamicFields" :key="keyField" :class="field.class">
-                    <dynamic-field v-model="formEvent[keyField]" class="q-mx-sm" :field="field"/>
-                  </div>
-                </div>
-                <div class="row justify-end">
-                  <q-btn
-                    :label="$tr('isite.cms.label.save')" color="primary"
-                    no-caps unelevated rounded
-                    @click="$refs.formContent.submit()"
-                  />
-                </div>
-              </q-form>
-            </master-modal>
           </q-tab-panel>
         </q-tab-panels>
       </div>
       <!--Resume-->
       <div class="col-4">
-        <div id="resume">
-          <!-- Category -->
-          <div>
-            <div class="text-primary row justify-between">
-              {{ $tr('isite.cms.label.category') }}
-              <q-btn icon="fa-light fa-pen" round outline size="xs"
-                     @click="editSection('category')" />
-            </div>
-            {{ selectedInformation.category?.title ?? '-' }}
-          </div>
-
-          <q-separator class="q-my-sm" />
-
-          <!-- Services -->
-          <div>
-            <div class="text-primary row justify-between">
-              {{ $trp('isite.cms.label.service') }}
-              <q-btn icon="fa-light fa-pen" round outline size="xs"
-                     :disabled="!selected.categoryId"
-                     @click="editSection('service')" />
-            </div>
-            <div>
-              <template v-for="(service, index) in selectedInformation.services"
-                        :key="index">
-                - {{ service.title }} ->
-                {{ service.humanShiftTime }} ->
-                $ {{ $trn(service.price) }}
-                <br><br>
-              </template>
-            </div>
-          </div>
-
-          <q-separator class="q-my-sm" />
-
-          <!-- Resource -->
-          <div>
-            <div class="text-primary row justify-between">
-              {{ $tr('isite.cms.label.resource') }}
-              <q-btn icon="fa-light fa-pen" round outline size="xs"
-                     :disabled="!selected.serviceId.length"
-                     @click="editSection('resource')" />
-            </div>
-            {{ selectedInformation.resource?.title ?? '-' }}
-          </div>
-
-          <q-separator class="q-my-sm" />
-
-          <!-- Availability -->
-          <div>
-            <div class="text-primary row justify-between">
-              (pt) Availability
-            </div>
-            {{ !selectedInformation.availability ? '-' : $trd(`${selectedInformation.availability.calendarDate} ${selectedInformation.availability.startTime}`, { type: 'shortHuman' })
-            }}
-          </div>
-
-          <!--Actions-->
-          <div class="q-mt-lg">
-            <!--Next step-->
-            <q-btn color="primary" unelevated rounded :label="$tr('isite.cms.label.continue')"
-                   class="full-width" :disabled="!allowNext"
-                   @click="nextStep" v-if="step != 'availability'" />
-            <!--Book step-->
-            <q-btn color="green" unelevated rounded label="(pt) Reservar"
-                   class="full-width" v-if="reservation.isReady"
-                   @click="createReservation" />
-          </div>
-        </div>
+        <resume />
+        <pre>{{selected}}</pre>
       </div>
     </div>
     <!-- Inner loading-->
@@ -203,27 +92,27 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, provide } from 'vue';
 import controller from 'modules/qbooking/_components/bookingForm/controller';
-import calendar from 'modules/qbooking/_components/bookingForm/calendar.vue';
+import resume from 'modules/qbooking/_components/bookingForm/views/resume.vue';
+import calendar from 'modules/qbooking/_components/bookingForm/views/calendar.vue';
 
 export default defineComponent({
   props: {},
-  components: { calendar },
+  components: { resume, calendar },
   setup (props, { emit })
   {
-    return controller(props, emit);
+    // Initialize the controller instance
+    const controllerInstance = controller(props, emit);
+    // Provide the controller for child components
+    provide('controller', controllerInstance);
+    // Return the controller instance to make it available to the template
+    return controllerInstance;
   }
 });
 </script>
 <style lang="scss">
 #bookingFormComponent {
-  #resume {
-    padding: 15px;
-    border: 2px solid $grey-4;
-    border-radius: $custom-radius;
-  }
-
   .item-selectable {
     cursor: pointer;
     padding: 15px;
