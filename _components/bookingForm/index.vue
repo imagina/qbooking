@@ -20,6 +20,10 @@
       <!--Stepper content-->
       <div class="col-8">
         <q-tab-panels v-model="step" animated ref="stepsForm" keep-alive>
+          <!--Step Customer-->
+          <q-tab-panel name="customer">
+            <dynamic-field v-model="selected['customerId']" class="q-mx-sm" :field="customerField" />
+          </q-tab-panel>
           <!--Step Category-->
           <q-tab-panel name="category">
             <div class="row q-col-gutter-sm">

@@ -1,14 +1,16 @@
 <template>
   <div id="bookingFormCalendar">
+    {{ formEvent }}
     <!-- Calendar -->
     <vue-cal
       v-bind="vueCalProps"
       :selected-date="selected.date"
       :events="events"
       :split-days="resourcesByDay"
-      @event-drop="updateNewEvent"
+      @event-drop="val => updateNewEvent(val)"
       @view-change="viewChange"
-      @cell-click="selectShift"
+      @cell-click="val =>selectShift(val)"
+      @event-click="selectShift(false)"
     >
       <!-- Custom title -->
       <template #title="{ title, view }">
@@ -102,53 +104,31 @@ export default defineComponent({
               label: this.$tr('isite.cms.form.startDate'),
               hourOptions,
               rules: [
-                (val) => !!val || this.$tr('isite.cms.message.fieldRequired')
-              ]
+                (val) => !!val || this.$tr("isite.cms.message.fieldRequired"),
+                (val) => (!!val && (parseInt(val.split(':')[0]) >= hourOptions[0] && parseInt(val.split(':')[0]) <= hourOptions[hourOptions.length -1]) )  || `hour should between: 8 - 20`,
+              ],
             }
           },
-          endDate: {
+          endDate: {          
             value: null,
             type: 'hour',
             class: 'col-6',
             props: {
               disable: true,
-              label: this.$tr('isite.cms.form.endDate')
+              label: this.$tr('isite.cms.form.endDate'),
             }
-          },
-          customerId: {
-            value: null,
-            class: 'col-12',
-            type: 'crud',
-            permission: 'profile.user.index',
-            props: {
-              crudType: 'select',
-              crudData: import('modules/quser/_crud/users'),
-              crudProps: {
-                label: this.$tr('isite.cms.label.customer'),
-                rules: [
-                  (val) => !!val || this.$tr('isite.cms.message.fieldRequired')
-                ]
-              },
-              config: {
-                filterByQuery: true,
-                options: {
-                  label: 'fullName',
-                  value: 'id'
-                },
-                loadedOptions: (data) => this.customers = data
-              }
-            }
-          }
+          },        
         }
       },
       formEvent: {}
+      
     };
   },
   computed: {
     //Map the resource to use as split in calendar
-    resourcesByDay ()
-    {
-      return this.resources.map(item => ({ id: item.id, label: item.title, class: '' }));
+    resourcesByDay ()    {
+      const resources = this.selectedInformation.resource ? [this.selectedInformation.resource] : this.resources
+      return resources.map(item => ({ id: item.id, label: item.title, class: '' }));
     },
     // Map the Reservations to show in the calendar
     events ()
@@ -185,11 +165,13 @@ export default defineComponent({
       this.nextStep();
     },
     selectShift (item)
-    {
-      this.formEvent.startDate = this.$moment(item.date)
-        .set('minute', (this.$moment(item.date).minutes() >= 30 ? 30 : 0))
-        .format(formatTime);
-      this.formEvent.split = item.split;
+    { 
+      if(item){
+        this.formEvent.startDate = this.$moment(item.date)
+          .set('minute', (this.$moment(item.date).minutes() >= 30 ? 30 : 0))
+          .format(formatTime);
+        this.formEvent.split = item.split;
+      }
       this.modal.show = true;
     },
     defineEndDate ()
@@ -224,9 +206,11 @@ export default defineComponent({
       this.newEvent.split = event.split;
       //update the date
       this.newEvent.start = this.$moment(event.start).format('YYYY/MM/DD HH:mm');
-      this.newEvent.end = this.$moment(event.end).format('YYYY/MM/DD HH:mm');
+      this.newEvent.end = this.$moment(event.end).format('YYYY/MM/DD HH:mm');      
       this.selected.startDate = this.newEvent.start;
       this.selected.endDate = this.newEvent.end;
+      
+      this.formEvent.startDate =  this.$moment(this.newEvent.start).format(formatTime)      
     }
   }
 });

@@ -1,10 +1,23 @@
 <template>
   <div id="bookingFormResume">
+    <!-- Customer -->
+    <div>
+      <div class="top-content">
+        customer
+        <q-btn icon="fa-light fa-pen" round outline size="xs"          
+               @click="editSection('customer')" />
+      </div>
+      {{ customerTitle }}
+    </div>
+
+    <q-separator class="q-my-sm" />
+
     <!-- Category -->
     <div>
       <div class="top-content">
         {{ $tr('isite.cms.label.category') }}
         <q-btn icon="fa-light fa-pen" round outline size="xs"
+                :disabled="!selected?.customerId" 
                @click="editSection('category')" />
       </div>
       {{ selectedInformation.category?.title ?? '-' }}
@@ -68,7 +81,7 @@
              @click="nextStep" v-if="step != 'availability'" />
       <!--Book step-->
       <q-btn color="green" unelevated rounded label="(pt) Reservar"
-             class="full-width" v-if="false"
+             class="full-width" v-if="showCreateButton"
              @click="createReservation" />
     </div>
   </div>
@@ -82,23 +95,46 @@ export default defineComponent({
     // Inject the controller from the parent
     return inject('controller');
   },
+  computed: {
+    customerTitle(){
+      return this.selectedInformation.customer? `${this.selectedInformation.customer?.firstName} ${this.selectedInformation.customer?.lastName}` : '-'
+    }, 
+    showCreateButton(){
+      return this.selected?.categoryId && this.selected?.serviceId && this.selected?.resourceId &&
+             this.selected?.startDate && this.selected?.endDate
+    }
+  },
   methods: {
     //Edit especific section
     editSection(section) {
       //Action by step
       //TODO: reset start/end date and customerId
       switch (section) {
-        case'category':
-          this.selected.serviceId = [];
-          this.selected.resourceId = null;
+        case'customer':
+          this.selected.categoryId = null
+          this.selected.serviceId = []
+          this.selected.resourceId = null
           this.newEvent = null;
+          this.selected.startDate = null
+          this.selected.endDate = null
+          break;
+        case'category':          
+          this.selected.serviceId = []
+          this.selected.resourceId = null
+          this.newEvent = null;
+          this.selected.startDate = null
+          this.selected.endDate = null
           break;
         case'service':
-          this.selected.resourceId = null;
+          this.selected.resourceId = null
           this.newEvent = null;
+          this.selected.startDate = null
+          this.selected.endDate = null
           break;
-        case'resource':
+        case'resource':        
           this.newEvent = null;
+          this.selected.startDate = null
+          this.selected.endDate = null
           break;
       }
       //Next step

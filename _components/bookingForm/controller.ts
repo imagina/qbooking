@@ -15,8 +15,15 @@ export default function controller (props: any, emit: any)
   // States
   const state = reactive({
     loading: false,
-    step: 'category',
+    step: 'customer',
     steps: [
+      {
+        value: 'customer',
+        title: 'customer-title',
+        description: 'customer-desctiption',
+        label: '',//kepp this to work with q-option
+        required: 'customerId'
+      },
       {
         value: 'category',
         title: i18n.tr('ibooking.cms.titleStepCategory'),
@@ -59,7 +66,32 @@ export default function controller (props: any, emit: any)
       endDate: null,
       customerId: null
     },
-    customers: [] //store the loaded customers
+    customers: [],  //store the loaded customers
+    customerField: {
+      value: null,
+      class: 'col-6',
+      type: "crud",
+      permission: 'profile.user.index',
+      props: {
+        crudType: "select",
+        crudData: import("modules/quser/_crud/users"),
+        crudProps: {
+          clearable: true,
+          label: i18n.tr('isite.cms.label.customer'),
+          rules: [
+            (val) => !!val || i18n.tr("isite.cms.message.fieldRequired"),
+          ],
+        },
+        config: {
+          filterByQuery: true,
+          options: {
+            label: "fullName",
+            value: "id",
+          },
+          loadedOptions: (data) => state.customers = data
+        },
+      },
+    },
   });
 
   // Computed
@@ -71,7 +103,9 @@ export default function controller (props: any, emit: any)
       services: !state.selected.serviceId ? null :
         state.services.filter(item => state.selected.serviceId.includes(item.id)),
       resource: !state.selected.resourceId ? null :
-        state.resources.find(item => item.id == state.selected.resourceId)
+        state.resources.find(item => item.id == state.selected.resourceId), 
+      customer: !state.selected?.customerId ? null :
+        state.customers.find(item => item.id == state.selected.customerId)
     })),
     // Validate if current step is allow to continue
     allowNext: computed(() =>
@@ -184,11 +218,10 @@ export default function controller (props: any, emit: any)
       //Instance the reservation data
 
       let reservationData = {
-        startDate: state.newEvent.start,
-        endDate: state.newEvent.end,
-        customerId: state.formEvent.customerId,
-        //resourceId: computeds.selectedInformation.value.resource.title,
-        //resourceTitle: computeds.selectedInformation.value.resource.title
+        startDate: state.selected.startDate,
+        endDate: state.selected.endDate,
+        customerId: computeds.selectedInformation.value.customer.id,
+        resourceId: computeds.selectedInformation.value.resource.title,
         items: computeds.selectedInformation.value.services.map(item => ({
           serviceId: item.id,
           serviceTitle: item.title,
