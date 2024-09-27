@@ -5,8 +5,11 @@
       :selected-date="selectedDate"
       :events="events"
       :split-days="splitDays"
-      @event-change="(val) => {console.log(val)}"
-      @view-change="(event) => selectedDate = $moment(event.startDate).format('YYYY/MM/DD')"
+      @event-drop="(val) => $emit('updateEvent', val)"
+      @view-change="(event) => {
+        selectedDate = $moment(event.startDate).format('YYYY/MM/DD')
+        $emit('update-date', selectedDate)
+        }"
       @cell-click="(val) => $emit('openModal', val)"
       @event-click="(val) => $emit('openModal', false)"
     >
@@ -33,7 +36,7 @@ import 'vue-cal/dist/vuecal.css';
 import moment from 'moment';
 
 export default {
-  emits: ['updateDate', 'openModal'],
+  emits: ['updateDate', 'openModal', 'updateEvent', 'update-date'],
   props: {
     splitDays: { type: Array },
     events: { type: Array, default: () => ([]) }
@@ -58,11 +61,12 @@ export default {
         'time-from': 8 * 60, //start of the day
         'time-to': 20 * 60, //end of the day
         'time-step': 30,
+        'snap-to-time': 15,
         'active-view': 'day',
         'disable-views': ['years', 'year', 'month', 'week'],
         'editable-events': {
           title: false,
-          drag: false,
+          drag: true,
           resize: false,
           delete: true,
           create: true

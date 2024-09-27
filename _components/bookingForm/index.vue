@@ -76,8 +76,9 @@
           <!--availability-->
           <q-tab-panel name="availability">
             <calendar :split-days="resourcesByDay" :events="events"
-                      @update-date="newDate => {selected.date = newDate; nextStep()}"
+                      @update-date="newDate => {selected.date = newDate}"
                       @openModal="val => openModal(val)"
+                      @updateEvent="val => updateNewEvent(val)"
             />
 
             <master-modal
@@ -96,9 +97,21 @@
                 }"
                 @validation-error="$alert.error($tr('isite.cms.message.formInvalid'))"
               >
+                <div class="row col-12">
+                Client:  {{ reservation.title }}
+                </div>
+                <div class="row col-12">
+                  Service: {{ reservation.content }}
+                </div>
+                <div class="row col-12">
+                  Duration: {{ reservation.time }}
+                </div>
+                <div class="row col-12">
+                  resource: {{ reservation.resource.title }}
+                </div>
                 <div class="row">
                   <div v-for="(field, keyField) in modal.dynamicFields" :key="keyField" :class="field.class">
-                      <dynamic-field v-model="formEvent[keyField]" class="q-mx-sm" :field="field"/>
+                    <dynamic-field v-model="formEvent[keyField]" class="q-mx-sm" :field="field"/>
                   </div>
                 </div>
                 <div class="row justify-end">
@@ -179,7 +192,7 @@
                    @click="nextStep" v-if="step != 'availability'" />
             <!--Book step-->
             <q-btn color="green" unelevated rounded label="(pt) Reservar"
-                   class="full-width" v-if="reservationIsReady"
+                   class="full-width" v-if="reservation.isReady"
                    @click="createReservation" />
           </div>
         </div>
