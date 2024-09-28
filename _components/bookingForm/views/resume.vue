@@ -3,7 +3,7 @@
     <!-- Customer -->
     <div>
       <div class="top-content">
-        customer
+        {{ $tr('isite.cms.label.customer') }}
         <q-btn icon="fa-light fa-pen" round outline size="xs"          
                @click="editSection('customer')" />
       </div>

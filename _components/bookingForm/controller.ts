@@ -19,7 +19,7 @@ export default function controller (props: any, emit: any)
     steps: [
       {
         value: 'customer',
-        title: 'customer-title',
+        title: i18n.tr('isite.cms.label.category'),
         description: 'customer-desctiption',
         label: '',//kepp this to work with q-option
         required: 'customerId'

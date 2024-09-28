@@ -1,6 +1,5 @@
 <template>
   <div id="bookingFormCalendar">
-    {{ formEvent }}
     <!-- Calendar -->
     <vue-cal
       v-bind="vueCalProps"
@@ -9,8 +8,8 @@
       :split-days="resourcesByDay"
       @event-drop="val => updateNewEvent(val)"
       @view-change="viewChange"
-      @cell-click="val =>selectShift(val)"
-      @event-click="selectShift(false)"
+      @cell-click="val => selectShift(val)"
+      @event-click="val => selectShift(val)"
     >
       <!-- Custom title -->
       <template #title="{ title, view }">
@@ -49,6 +48,7 @@
 </template>
 
 <script lang="ts">
+import moment from 'moment';
 import { computed, defineComponent, inject } from 'vue';
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
@@ -120,15 +120,14 @@ export default defineComponent({
           },        
         }
       },
-      formEvent: {}
-      
+      formEvent: {},
     };
   },
   computed: {
     //Map the resource to use as split in calendar
     resourcesByDay ()    {
       const resources = this.selectedInformation.resource ? [this.selectedInformation.resource] : this.resources
-      return resources.map(item => ({ id: item.id, label: item.title, class: '' }));
+      return resources.map(item => ({ id: item.id, label: item.title, class: '', workTimes: (item?.schedule?.workTimes || null) }));
     },
     // Map the Reservations to show in the calendar
     events ()
@@ -138,10 +137,31 @@ export default defineComponent({
         end: item.endDate,
         title: item.customer ? `${item.customer.firstName} ${item.customer.lastName}` : '-',
         content: item.items.map(item => item.service.title).join(','),
-        class: '',
-        split: item.resourceId
+        class: 'booked',
+        split: item.resourceId, 
+        background: false
       }));
-      //Include new event
+
+      //Add Availability Events      
+      this.resourcesByDay.map(resource => {        
+        if(resource?.workTimes){
+          resource.workTimes.map(workTime => {
+            if(this.$moment(this.selected.date).weekday() == workTime.dayId){
+              events.push({
+                start: this.$moment(`${this.selected.date} ${workTime.startTime}`).format('YYYY/MM/DD HH:mm'),
+                end: this.$moment(`${this.selected.date} ${workTime.endTime}`).format('YYYY/MM/DD HH:mm'),
+                //title: '',
+                content: '&nbsp;Avaliable resource',
+                class: 'avaliable',
+                split: resource.id, 
+                background: true
+              })
+            }
+          })
+        }
+      })
+
+      //Include new event            
       if (this.newEvent) events.push(this.newEvent);
       //Response
       return events;
@@ -161,17 +181,17 @@ export default defineComponent({
     //Handle the event view change from calendar
     viewChange (event)
     {
-      this.selected.date = this.$moment(event.startDate).format('YYYY/MM/DD');
+      this.selected.date = this.$moment(event.startDate).format('YYYY/MM/DD');      
       this.nextStep();
     },
     selectShift (item)
-    { 
-      if(item){
-        this.formEvent.startDate = this.$moment(item.date)
-          .set('minute', (this.$moment(item.date).minutes() >= 30 ? 30 : 0))
-          .format(formatTime);
-        this.formEvent.split = item.split;
-      }
+    {
+      //@clic-cell returns item.date, @clic-event returns item.start
+      const startDate = item?.start ? item.start : item.date
+      this.formEvent.startDate = this.$moment(startDate)
+        .set('minute', (this.$moment(startDate).minutes() >= 30 ? 30 : 0))
+        .format(formatTime);
+      this.formEvent.split = item.split;      
       this.modal.show = true;
     },
     defineEndDate ()
@@ -191,8 +211,9 @@ export default defineComponent({
         end: endDate,
         title: this.reservation.title,
         content: this.reservation.content,
-        class: '',
-        split: this.formEvent.split
+        class: 'booked',
+        split: this.formEvent.split, 
+        background: false
       };
       this.selected.startDate = startDate;
       this.selected.endDate = endDate;
@@ -227,5 +248,27 @@ export default defineComponent({
       font-size: 16px;
     }
   }
+
+  .avaliable {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+    background-color: rgba(77, 251, 2, 0.15);
+    border: solid rgba(0, 253, 51, 0.3);
+    border-width: 2px 0;
+    font-size: 1em;
+    color: #999;
+  }
+
+  .booked {    
+    background-color: rgba(255, 25, 0, 0.5);
+    border: solid rgba(240, 105, 90, 0.8);
+    color: #ffffff;
+  }
+
+  
 }
+
+
 </style>

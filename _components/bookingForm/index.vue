@@ -88,7 +88,6 @@
       <!--Resume-->
       <div class="col-4">
         <resume />
-        <pre>{{selected}}</pre>
       </div>
     </div>
     <!-- Inner loading-->
