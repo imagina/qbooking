@@ -35,7 +35,10 @@ export default {
     return new Promise((resolve, reject) =>
     {
       const requestParams = {
-        refresh, params: { filter: { services: services } }
+        refresh, params: { 
+          filter: { services: services }, 
+          include: 'schedule.workTimes' 
+         }
       };
       //Request
       baseService.index('apiRoutes.qbooking.resources', requestParams)
