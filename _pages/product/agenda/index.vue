@@ -1,13 +1,14 @@
 <template>
   <div id="adminAgendaPage">
     <!--Dynamic List-->
-    <dynamic-list :list-config="listConfig" @new="showBookingForm = true" />
+    <dynamic-list :list-config="listConfig" @new="showBookingForm = true"
+                  ref="dynamicListComponent" />
     <!-- Booking Form -->
     <master-modal v-model="showBookingForm"
                   :title="$tr('ibooking.cms.newReservation')"
                   custom-position
     >
-      <booking-form ref="dynamicListComponent" @created="reservationCreated" />
+      <booking-form @created="reservationCreated" />
     </master-modal>
   </div>
 </template>

@@ -19,7 +19,7 @@
     <div class="row q-col-gutter-md">
       <!--Stepper content-->
       <div class="col-8">
-        <q-tab-panels v-model="step" animated ref="stepsForm" keep-alive>
+        <q-tab-panels v-model="step" animated ref="stepsForm">
           <!--Step Customer-->
           <q-tab-panel name="customer">
             <dynamic-field v-model="selected['customerId']" class="q-mx-sm" :field="customerField" />
@@ -79,9 +79,12 @@
           </q-tab-panel>
           <!--availability-->
           <q-tab-panel name="availability">
-            <calendar @openModal="val => openModal(val)"
-                      @updateEvent="val => updateNewEvent(val)"
-            />
+            <div id="calendarContent">
+              <calendar @openModal="val => openModal(val)"
+                        @updateEvent="val => updateNewEvent(val)"
+
+              />
+            </div>
           </q-tab-panel>
         </q-tab-panels>
       </div>
@@ -158,6 +161,12 @@ export default defineComponent({
 
   .q-tab-panel {
     padding: 0 !important;
+  }
+
+  #calendarContent {
+    border: 2px solid $grey-4;
+    border-radius: $custom-radius;
+    overflow: hidden;
   }
 }
 </style>

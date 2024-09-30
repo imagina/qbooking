@@ -19,8 +19,8 @@ export default function controller (props: any, emit: any)
     steps: [
       {
         value: 'customer',
-        title: i18n.tr('isite.cms.label.category'),
-        description: 'customer-desctiption',
+        title: i18n.tr('isite.cms.label.customer'),
+        description: '(PT) customer-desctiption',
         label: '',//kepp this to work with q-option
         required: 'customerId'
       },
@@ -56,42 +56,31 @@ export default function controller (props: any, emit: any)
     services: [],
     resources: [],
     reservations: [],
-    newEvent: null,
+    newReservation: null,
     selected: {
       categoryId: null,
       serviceId: [],
       resourceId: null,
-      date: moment().format('YYYY/MM/DD'),
-      startDate: null,
-      endDate: null,
+      date: moment().format('YYYY-MM-DD'),
       customerId: null
     },
-    customers: [],  //store the loaded customers
     customerField: {
       value: null,
-      class: 'col-6',
-      type: "crud",
-      permission: 'profile.user.index',
+      type: 'select',
       props: {
-        crudType: "select",
-        crudData: import("modules/quser/_crud/users"),
-        crudProps: {
-          clearable: true,
-          label: i18n.tr('isite.cms.label.customer'),
-          rules: [
-            (val) => !!val || i18n.tr("isite.cms.message.fieldRequired"),
-          ],
-        },
-        config: {
-          filterByQuery: true,
-          options: {
-            label: "fullName",
-            value: "id",
-          },
-          loadedOptions: (data) => state.customers = data
-        },
+        clearable: true,
+        label: i18n.tr('isite.cms.label.customer'),
+        emitValue: false,
+        rules: [
+          (val) => !!val || i18n.tr('isite.cms.message.fieldRequired')
+        ]
       },
-    },
+      loadOptions: {
+        apiRoute: 'apiRoutes.quser.users',
+        filterByQuery: true,
+        select: { label: 'fullName', id: 'id' }
+      }
+    }
   });
 
   // Computed
@@ -102,10 +91,8 @@ export default function controller (props: any, emit: any)
         state.categories.find(item => item.id == state.selected.categoryId),
       services: !state.selected.serviceId ? null :
         state.services.filter(item => state.selected.serviceId.includes(item.id)),
-      resource: !state.selected.resourceId ? null :
-        state.resources.find(item => item.id == state.selected.resourceId), 
-      customer: !state.selected?.customerId ? null :
-        state.customers.find(item => item.id == state.selected.customerId)
+      resource: state.newReservation?.resourceId ?
+        state.resources.find(item => item.id == state.newReservation?.resourceId) : null
     })),
     // Validate if current step is allow to continue
     allowNext: computed(() =>
@@ -190,12 +177,11 @@ export default function controller (props: any, emit: any)
           break;
         case'resource':
         case'availability':
-          state.newEvent = null;
+          state.newReservation = null;
           methods.getData('getReservations', 'reservations', {
             refresh: true, params: {
               include: 'customer,items.service',
               filter: {
-                resourceId: state.selected.resourceId,
                 date: {
                   field: 'start_date',
                   from: state.selected.date,
@@ -218,20 +204,18 @@ export default function controller (props: any, emit: any)
       //Instance the reservation data
 
       let reservationData = {
-        startDate: state.selected.startDate,
-        endDate: state.selected.endDate,
-        customerId: computeds.selectedInformation.value.customer.id,
-        resourceId: computeds.selectedInformation.value.resource.title,
+        startDate: state.newReservation.start,
+        endDate: state.newReservation.end,
+        customerId: state.selected.customerId.id,
+        resourceId: state.newReservation.resourceId,
         items: computeds.selectedInformation.value.services.map(item => ({
-          serviceId: item.id,
-          serviceTitle: item.title,
-          categoryId: item.category.id,
-          categoryTitle: item.category.title,
           price: item.price,
-          resourceId: computeds.selectedInformation.value.resource.id,
-          resourceTitle: computeds.selectedInformation.value.resource.title
+          serviceId: item.id,
+          categoryId: item.category.id,
+          resourceId: state.newReservation.resourceId
         }))
       };
+
       //Request
       service.createReservation(reservationData).then(response =>
       {

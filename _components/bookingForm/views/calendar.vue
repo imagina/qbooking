@@ -6,7 +6,6 @@
       :selected-date="selected.date"
       :events="events"
       :split-days="resourcesByDay"
-      @event-drop="val => updateNewEvent(val)"
       @view-change="viewChange"
       @cell-click="val => selectShift(val)"
       @event-click="val => selectShift(val)"
@@ -26,6 +25,10 @@
           </q-popup-proxy>
         </div>
       </template>
+      <!-- Custom split label-->
+      <template #split-label="{ split, view }">
+        <div :style="`color: ${split.color}`" v-html="split.label" />
+      </template>
     </vue-cal>
     <!-- Confirm Shift Modal-->
     <master-modal v-model="modal.show" :title="'(PT) Turno'"
@@ -33,11 +36,9 @@
       <q-form autocorrect="off" autocomplete="off" @submit="addNewEvent"
               @validation-error="$alert.error($tr('isite.cms.message.formInvalid'))"
       >
-        <div class="row">
-          <div v-for="(field, keyField) in modal.dynamicFields" :key="keyField" :class="field.class">
-            <dynamic-field v-model="formEvent[keyField]" class="q-mx-sm" :field="field" />
-          </div>
-        </div>
+        <template v-for="(field, keyField) in modal.dynamicFields" :key="keyField">
+          <dynamic-field v-model="formEvent[keyField]" class="q-mx-sm" :field="field" />
+        </template>
         <div class="row justify-end">
           <q-btn :label="$tr('isite.cms.label.save')" color="primary"
                  no-caps unelevated rounded type="submit" />
@@ -53,8 +54,9 @@ import { computed, defineComponent, inject } from 'vue';
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
 
+const startBookTime = '08:00';
+const endBookTime = '20:00';
 const formatTime = 'HH:mm';
-//TODO: define available schedule
 const hourOptions = Array.from({ length: 13 }, (_, index) => index + 8); //from 8h to 20h
 
 export default defineComponent({
@@ -73,25 +75,18 @@ export default defineComponent({
   {
     return {
       vueCalProps: {
-        'time-from': 8 * 60, // start of the day
-        'time-to': 20 * 60, // end of the day
+        'time-from': parseInt(startBookTime.split(':')[0]) * 60, // start of the day
+        'time-to': parseInt(endBookTime.split(':')[0]) * 60, // end of the day
         'time-step': 30,
         'snap-to-time': 15,
         'active-view': 'day',
         'disable-views': ['years', 'year', 'month', 'week'],
-        'editable-events': {
-          title: false,
-          drag: true,
-          resize: false,
-          delete: true,
-          create: true
-        },
         'hide-view-selector': true,
         locale: 'es',
         'stickySplitLabels': true,
         style: 'height: 600px',
-        'todayButton': true,
-        'min-date': new Date() // TODO: this is not working for active-view day
+        'twelveHour': true,
+        'min-date': new Date()
       },
       modal: {
         show: false,
@@ -99,139 +94,155 @@ export default defineComponent({
           startDate: {
             value: null,
             type: 'hour',
-            class: 'col-6',
             props: {
               label: this.$tr('isite.cms.form.startDate'),
               hourOptions,
               rules: [
-                (val) => !!val || this.$tr("isite.cms.message.fieldRequired"),
-                (val) => (!!val && (parseInt(val.split(':')[0]) >= hourOptions[0] && parseInt(val.split(':')[0]) <= hourOptions[hourOptions.length -1]) )  || `hour should between: 8 - 20`,
-              ],
+                (val) => !!val || this.$tr('isite.cms.message.fieldRequired'),
+                (val) => (!!val && (parseInt(val.split(':')[0]) >= hourOptions[0] && parseInt(val.split(':')[0]) <= hourOptions[hourOptions.length - 1])) || `hour should between: 8 - 20`
+              ]
             }
           },
-          endDate: {          
+          endDate: {
             value: null,
             type: 'hour',
-            class: 'col-6',
             props: {
               disable: true,
-              label: this.$tr('isite.cms.form.endDate'),
+              label: this.$tr('isite.cms.form.endDate')
             }
-          },        
+          }
         }
       },
-      formEvent: {},
+      formEvent: {}
     };
   },
   computed: {
     //Map the resource to use as split in calendar
-    resourcesByDay ()    {
-      const resources = this.selectedInformation.resource ? [this.selectedInformation.resource] : this.resources
-      return resources.map(item => ({ id: item.id, label: item.title, class: '', workTimes: (item?.schedule?.workTimes || null) }));
+    resourcesByDay ()
+    {
+      //Map the resources
+      let resources = this.resources.map((item, index) => ({
+        id: item.id,
+        label: item.title,
+        class: !(index % 2) ? 'resource1' : 'resource2',
+        workTimes: (item?.schedule?.workTimes || [])
+      }));
+
+      //Move at first the favorite resource
+      let selectedIndex = resources.findIndex(item => item.id == this.selected.resourceId);
+      if (selectedIndex >= 0)
+      {
+        const [item] = resources.splice(selectedIndex, 1);
+        resources.unshift({ ...item, label: `<span>★</span> ${item.label} <span>★</span>` });
+      }
+
+      //Response
+      return resources;
     },
     // Map the Reservations to show in the calendar
     events ()
     {
+      //Map all the day events
       const events = this.reservations.map(item => ({
         start: item.startDate,
         end: item.endDate,
         title: item.customer ? `${item.customer.firstName} ${item.customer.lastName}` : '-',
         content: item.items.map(item => item.service.title).join(','),
-        class: 'booked',
-        split: item.resourceId, 
-        background: false
+        split: item.resourceId
       }));
-
-      //Add Availability Events      
-      this.resourcesByDay.map(resource => {        
-        if(resource?.workTimes){
-          resource.workTimes.map(workTime => {
-            if(this.$moment(this.selected.date).weekday() == workTime.dayId){
-              events.push({
-                start: this.$moment(`${this.selected.date} ${workTime.startTime}`).format('YYYY/MM/DD HH:mm'),
-                end: this.$moment(`${this.selected.date} ${workTime.endTime}`).format('YYYY/MM/DD HH:mm'),
-                //title: '',
-                content: '&nbsp;Avaliable resource',
-                class: 'avaliable',
-                split: resource.id, 
-                background: true
-              })
-            }
-          })
-        }
-      })
-
-      //Include new event            
-      if (this.newEvent) events.push(this.newEvent);
+      //Include new event
+      if (this.newReservation) events.push(this.newReservation);
+      //Include the disabled workTimes by resource schedule
+      this.resourcesByDay.forEach(resource =>
+      {
+        this.getDisableSlots(resource.workTimes).forEach(item => events.push({
+          start: `${this.selected.date} ${item.startTime}`,
+          end: `${this.selected.date} ${item.endTime}`,
+          title: '(pt) No Disponible',
+          split: resource.id,
+          class: 'slot-disabled'
+        }));
+      });
       //Response
       return events;
-    },
-    reservation ()
-    {
-      const customer = this.formEvent?.customerId ? this.customers.find(item => item.id == this.formEvent.customerId) : false;
-      const title = customer ? `${customer?.firstName} ${customer?.lastName}` : '-';
-      const resource = this.resources.find(item => item.id == this.formEvent.split);
-      const content = this.selectedInformation.services.map(item => item.title).join(', ');
-      const time = this.selectedInformation.services.reduce((sum, { shiftTime }) => sum + shiftTime, 0);
-      const isReady = this.newEvent?.start && this.newEvent?.end && this.selected?.resourceId && this.formEvent?.customerId;
-      return { title, resource, content, time, isReady };
     }
   },
   methods: {
     //Handle the event view change from calendar
     viewChange (event)
     {
-      this.selected.date = this.$moment(event.startDate).format('YYYY/MM/DD');      
+      this.selected.date = this.$moment(event.startDate).format('YYYY/MM/DD');
       this.nextStep();
+    },
+    //Return the disable slot
+    getDisableSlots (availableSlots)
+    {
+      //Turn time String "mm:ss" to minutes
+      const timeToMinutes = (time) =>
+      {
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
+      };
+
+      // Sort the time slots by startTime
+      const sortedSlots = availableSlots.sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+
+      let disableSlots = [];
+      let lastEnd = startBookTime;
+
+      // Loop through each time slot and find gaps
+      sortedSlots.forEach(workTime =>
+      {
+        if (this.$moment(this.selected.date).weekday() == workTime.dayId)
+        {
+          if (timeToMinutes(workTime.startTime) > timeToMinutes(lastEnd)) disableSlots.push({
+            startTime: lastEnd, endTime: workTime.startTime
+          });
+          lastEnd = workTime.endTime;
+        }
+      });
+
+      // Check for any time after the last slot
+      if (timeToMinutes(lastEnd) < timeToMinutes(endBookTime)) disableSlots.push({
+        startTime: lastEnd,
+        endTime: endBookTime
+      });
+
+      //Response
+      return disableSlots;
     },
     selectShift (item)
     {
+      if (item.start && item.class != 'new-reservation') return null;
       //@clic-cell returns item.date, @clic-event returns item.start
-      const startDate = item?.start ? item.start : item.date
+      const startDate = item.start ?? item.date;
       this.formEvent.startDate = this.$moment(startDate)
         .set('minute', (this.$moment(startDate).minutes() >= 30 ? 30 : 0))
         .format(formatTime);
-      this.formEvent.split = item.split;      
+      this.formEvent.split = item.split;
       this.modal.show = true;
     },
     defineEndDate ()
     {
       this.formEvent.endDate = this.$moment(this.formEvent.startDate, formatTime)
-        .add(this.reservation.time, 'minutes')
+        .add(this.selectedInformation.services.reduce((sum, { shiftTime }) => sum + shiftTime, 0), 'minutes')
         .format(formatTime);
     },
     addNewEvent ()
     {
-      const selectedDate = this.$moment(new Date(this.selected.date)).format('YYYY/MM/DD');
-      const startDate = this.$moment(`${selectedDate} ${this.formEvent.startDate}`).format('YYYY/MM/DD HH:mm');
-      const endDate = this.$moment(`${selectedDate} ${this.formEvent.endDate}`).format('YYYY/MM/DD HH:mm');
-      this.selected.resourceId = this.formEvent.split;
-      this.newEvent = {
-        start: startDate,
-        end: endDate,
-        title: this.reservation.title,
-        content: this.reservation.content,
-        class: 'booked',
-        split: this.formEvent.split, 
-        background: false
+      //Put the data for new reservation
+      this.newReservation = {
+        start: this.$moment(`${this.selected.date} ${this.formEvent.startDate}`).format('YYYY/MM/DD HH:mm'),
+        end: this.$moment(`${this.selected.date} ${this.formEvent.endDate}`).format('YYYY/MM/DD HH:mm'),
+        title: this.selected.customerId.fullName,
+        content: this.selectedInformation.services.map(item => item.title).join(', '),
+        class: 'new-reservation',
+        split: this.formEvent.split,
+        resourceId: this.formEvent.split
       };
-      this.selected.startDate = startDate;
-      this.selected.endDate = endDate;
+
+      //Close modal
       this.modal.show = false;
-    },
-    updateNewEvent ({ event, originalEvent })
-    {
-      //update resource
-      this.formEvent.split = event.split;
-      this.selected.resourceId = event.split;
-      this.newEvent.split = event.split;
-      //update the date
-      this.newEvent.start = this.$moment(event.start).format('YYYY/MM/DD HH:mm');
-      this.newEvent.end = this.$moment(event.end).format('YYYY/MM/DD HH:mm');      
-      this.selected.startDate = this.newEvent.start;
-      this.selected.endDate = this.newEvent.end;
-      
-      this.formEvent.startDate =  this.$moment(this.newEvent.start).format(formatTime)      
     }
   }
 });
@@ -249,25 +260,71 @@ export default defineComponent({
     }
   }
 
-  .avaliable {
+  .day-split-header {
+    span {
+      color: $orange
+    }
+  }
+
+  .vuecal__cell-content {
+    cursor: pointer;
+  }
+
+  .vuecal__event {
+    color: white;
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    align-items: center;
-    padding: 4px;
-    background-color: rgba(77, 251, 2, 0.15);
-    border: solid rgba(0, 253, 51, 0.3);
-    border-width: 2px 0;
-    font-size: 1em;
-    color: #999;
+    border-radius: 10px;
+    cursor: not-allowed;
+
+    .vuecal__event-time {
+      font-weight: bold;
+    }
   }
 
-  .booked {    
-    background-color: rgba(255, 25, 0, 0.5);
-    border: solid rgba(240, 105, 90, 0.8);
-    color: #ffffff;
+  //----- Custom colors by resources
+  .resource1 {
+    &.day-split-header {
+      color: $teal;
+      font-weight: bold;
+    }
+
+    &.vuecal__cell-split {
+      background-color: rgb($teal, 0.08);
+    }
+
+    .vuecal__event {
+      background-color: $teal;
+    }
   }
 
-  
+  .resource2 {
+    &.day-split-header {
+      color: $indigo;
+      font-weight: bold;
+    }
+
+    &.vuecal__cell-split {
+      background-color: rgb($indigo, 0.08);
+    }
+
+    .vuecal__event {
+      background-color: $indigo;
+    }
+  }
+
+  .slot-disabled {
+    background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba($blue-grey, 0.15) 10px, rgba($blue-grey, 0.15) 20px) !important;
+    color: $blue-grey;
+    cursor: not-allowed;
+  }
+
+  .new-reservation {
+    background-color: $orange !important;
+    font-weight: bold !important;
+    cursor: pointer;
+  }
 }
 
 

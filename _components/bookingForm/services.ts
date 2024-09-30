@@ -35,9 +35,9 @@ export default {
     return new Promise((resolve, reject) =>
     {
       const requestParams = {
-        refresh, params: { 
-          filter: { services: services }, 
-          include: 'schedule.workTimes' 
+        refresh, params: {
+          filter: { services: services },
+          include: 'schedule.workTimes'
          }
       };
       //Request
@@ -45,29 +45,6 @@ export default {
         .then(response => resolve(response)).catch(error => reject(error));
     });
   },
-  getAvailabilities (refresh = false, params = {}): Promise<any>
-  {
-    return new Promise((resolve, reject) =>
-    {
-      const requestParams = { refresh, params };
-      //Request
-      baseService.index('apiRoutes.qbooking.availabilities', requestParams)
-        .then(response =>
-        {
-          response.data = response.data.map(item => ({ ...item, id: uid() }));
-          resolve(response);
-        }).catch(error => reject(error));
-    });
-  },
-  createReservation (data): Promise<any>
-  {
-    return new Promise((resolve, reject) =>
-    {
-      //Request
-      baseService.create('apiRoutes.qbooking.reservations', data)
-        .then(response => resolve(response)).catch(error => reject(error));
-    });
-  }, 
   getReservations (refresh = false, params = {}): Promise<any>
   {
     return new Promise((resolve, reject) =>
@@ -78,4 +55,13 @@ export default {
         .then(response => resolve(response)).catch(error => reject(error));
     });
   },
+  createReservation (data): Promise<any>
+  {
+    return new Promise((resolve, reject) =>
+    {
+      //Request
+      baseService.create('apiRoutes.qbooking.reservations', data)
+        .then(response => resolve(response)).catch(error => reject(error));
+    });
+  }
 };
