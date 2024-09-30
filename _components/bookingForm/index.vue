@@ -22,7 +22,9 @@
         <q-tab-panels v-model="step" animated ref="stepsForm">
           <!--Step Customer-->
           <q-tab-panel name="customer">
-            <dynamic-field v-model="selected['customerId']" class="q-mx-sm" :field="customerField" />
+            <div class="general-content q-py-md">
+              <customer />
+            </div>
           </q-tab-panel>
           <!--Step Category-->
           <q-tab-panel name="category">
@@ -79,7 +81,7 @@
           </q-tab-panel>
           <!--availability-->
           <q-tab-panel name="availability">
-            <div id="calendarContent">
+            <div class="general-content">
               <calendar @openModal="val => openModal(val)"
                         @updateEvent="val => updateNewEvent(val)"
 
@@ -100,12 +102,13 @@
 <script lang="ts">
 import { defineComponent, provide } from 'vue';
 import controller from 'modules/qbooking/_components/bookingForm/controller';
+import customer from 'modules/qbooking/_components/bookingForm/views/customer.vue';
 import resume from 'modules/qbooking/_components/bookingForm/views/resume.vue';
 import calendar from 'modules/qbooking/_components/bookingForm/views/calendar.vue';
 
 export default defineComponent({
   props: {},
-  components: { resume, calendar },
+  components: { customer, resume, calendar },
   setup (props, { emit })
   {
     // Initialize the controller instance
@@ -163,7 +166,7 @@ export default defineComponent({
     padding: 0 !important;
   }
 
-  #calendarContent {
+  .general-content {
     border: 2px solid $grey-4;
     border-radius: $custom-radius;
     overflow: hidden;

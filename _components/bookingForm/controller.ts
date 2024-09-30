@@ -63,23 +63,6 @@ export default function controller (props: any, emit: any)
       resourceId: null,
       date: moment().format('YYYY-MM-DD'),
       customerId: null
-    },
-    customerField: {
-      value: null,
-      type: 'select',
-      props: {
-        clearable: true,
-        label: i18n.tr('isite.cms.label.customer'),
-        emitValue: false,
-        rules: [
-          (val) => !!val || i18n.tr('isite.cms.message.fieldRequired')
-        ]
-      },
-      loadOptions: {
-        apiRoute: 'apiRoutes.quser.users',
-        filterByQuery: true,
-        select: { label: 'fullName', id: 'id' }
-      }
     }
   });
 
