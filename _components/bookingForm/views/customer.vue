@@ -1,12 +1,18 @@
 <template>
   <div id="bookingFormCustomer">
     <!-- Choose user -->
-    <dynamic-field v-model="selected.customerId" class="q-mx-sm" :field="dynamicField" />
-    <!-- New user -->
-    <div class="q-mt-lg">
-      <dynamic-form v-model="formNewUser" v-bind="formCustomer"
-                    @feedBack="val => selected.customerId = cal" />
+    <div class="q-px-md">
+      <div class="text-blue-grey text-bold text-center text-subtitle1 q-mb-md">
+        (pt) Seleccionar Cliente
+      </div>
+      <dynamic-field :field="dynamicField" @update:modelValue="chooseCustomer" />
     </div>
+    <div class="q-pt-lg">
+      <q-separator class="q-my-lg" inset size="2px" />
+    </div>
+    <!-- New user -->
+    <dynamic-form v-model="formNewUser" v-bind="formCustomer"
+                  @feedBack="chooseCustomer" />
   </div>
 </template>
 
@@ -34,13 +40,12 @@ export default defineComponent({
         loadOptions: {
           apiRoute: 'apiRoutes.quser.users',
           filterByQuery: true,
-          select: { label: 'fullName', id: 'id' }
+          select: { label: 'fullName', id: 'id', sublabel: 'phone' }
         }
       },
       formNewUser: {},
       formCustomer: {
         title: '(pt) Nuevo Cliente',
-        boxStyle: false,
         blocks: [
           {
             fields: {
@@ -69,7 +74,7 @@ export default defineComponent({
                 type: 'input',
                 props: {
                   label: `${this.$tr('isite.cms.form.phone')}*`,
-                  mask: '(###) ### ####',
+                  mask: '##########',
                   unmaskedValue: true,
                   rules: [val => (val.length >= 10) || this.$tr('isite.cms.message.fieldMinValue', { num: 10 })]
                 }
@@ -77,36 +82,37 @@ export default defineComponent({
             }
           }
         ],
-        withFeedBack: true,
         sendTo: {
           apiRoute: 'apiRoutes.quser.users',
-          extraData: {
+          extraData: (formData) => ({
             isActivated: 1,
-            roles: [2],
-            departments: [1],
+            roles: [2],//TODO: define roles to create neew customers
+            departments: [1],//TODO: define roles to create neew customers
             password: this.$uid(),
-            email: `test@mail.com`
-          }
+            email: `${formData.phone}@mail.com`
+          })
         }
       }
     };
   },
   computed: {},
-  methods: {}
+  methods: {
+    chooseCustomer(customer) {
+      this.selected.customerId = customer;
+      this.nextStep();
+    }
+  }
 });
 </script>
 
 <style lang="scss">
-#bookingFormResume {
-  padding: 15px;
-  border: 2px solid $grey-4;
-  border-radius: $custom-radius;
+#bookingFormCustomer {
+  #dynamicFormComponentContent {
+    box-shadow: none !important;
 
-  .top-content {
-    color: $primary;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    #progressContent {
+      display: none;
+    }
   }
 }
 </style>

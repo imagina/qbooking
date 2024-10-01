@@ -149,7 +149,8 @@ export default defineComponent({
   border-radius: $custom-radius;
 
   .top-content {
-    color: $primary;
+    color: $blue-grey;
+    font-weight: bold;
     display: flex;
     justify-content: space-between;
     align-items: center;

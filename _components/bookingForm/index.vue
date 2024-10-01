@@ -30,7 +30,7 @@
           <q-tab-panel name="category">
             <div class="row q-col-gutter-sm">
               <div v-for="(category, keyCategory) in categories" :key="keyCategory" class="col-12"
-                   @click="selectItem('categoryId', category.id)">
+                   @click="selectItem('categoryId', category.id); nextStep()">
                 <div :class="`item-selectable ${isValueSelected('categoryId',category.id)}`">
                   <!--Icon-->
                   <q-icon name="fas fa-layer-group" />
@@ -67,7 +67,7 @@
           <q-tab-panel name="resource">
             <div class="row q-col-gutter-sm">
               <div v-for="(resource, keyResource) in resources" :key="keyResource" class="col-12"
-                   @click="selectItem('resourceId', resource.id)">
+                   @click="selectItem('resourceId', resource.id); nextStep()">
                 <div :class="`item-selectable row items-center ${isValueSelected('resourceId', resource.id)}`">
                   <!--icon-->
                   <q-icon name="fas fa-chess-knight" />
