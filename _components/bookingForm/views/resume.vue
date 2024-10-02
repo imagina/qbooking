@@ -10,12 +10,11 @@
       <div v-if="selected.customerId">
         {{ selected.customerId.fullName }}
       </div>
+      <q-separator class="q-my-sm" />
     </div>
 
-    <q-separator class="q-my-sm" />
-
     <!-- Category -->
-    <div>
+    <div v-if="selected.categoryId">
       <div class="top-content">
         {{ $tr('isite.cms.label.category') }}
         <q-btn icon="fa-light fa-pen" round outline size="xs"
@@ -25,12 +24,11 @@
       <div v-if="selectedInformation.category">
         {{ selectedInformation.category.title }}
       </div>
+      <q-separator class="q-my-sm" />
     </div>
 
-    <q-separator class="q-my-sm" />
-
     <!-- Services -->
-    <div>
+    <div v-if="selected.serviceId.length">
       <div class="top-content">
         {{ $trp('isite.cms.label.service') }}
         <q-btn icon="fa-light fa-pen" round outline size="xs"
@@ -49,33 +47,40 @@
           <div> ${{ $trn(service.price) }}</div>
         </div>
       </template>
+      <q-separator class="q-my-sm" />
     </div>
 
-    <q-separator class="q-my-sm" />
-
     <!-- Resource -->
-    <div>
+    <div v-if="selectedInformation.resource">
       <div class="top-content">
         {{ $tr('isite.cms.label.resource') }}
         <q-btn icon="fa-light fa-pen" round outline size="xs"
                :disabled="!selected.serviceId.length"
                @click="editSection('resource')" />
       </div>
-      <div v-if="selectedInformation.resource">
+      <div>
         {{ selectedInformation.resource.title }}
+      </div>
+      <q-separator class="q-my-sm" />
+    </div>
+
+    <!-- Availability -->
+    <div v-if="newReservation">
+      <div class="top-content">
+        {{ $tr('ibooking.cms.shift') }}
+      </div>
+      <div>
+        {{ $trd(newReservation.start, { type: 'dayHuman' }) }} <br>
+        {{ $trd(newReservation.start, { type: 'time' }) }}
       </div>
     </div>
 
-    <q-separator class="q-my-sm" />
-
-    <!-- Availability -->
-    <div>
-      <div class="top-content">
-        (pt) Turno
-      </div>
-      <div v-if="newReservation">
-        {{ $trd(newReservation.start, { type: 'dayHuman' }) }} <br>
-        {{ $trd(newReservation.start, { type: 'time' }) }}
+    <!-- Total -->
+    <div v-if="selected.serviceId.length">
+      <q-separator class="q-mb-sm q-mt-xl" />
+      <div class="row justify-between text-bold">
+        <span>Total:</span>
+        <span>${{ $trn(selectedInformation.services.reduce((total, item) => total + item.price, 0)) }}</span>
       </div>
     </div>
 
@@ -86,7 +91,7 @@
              class="full-width" :disabled="!allowNext"
              @click="nextStep" v-if="step != 'availability'" />
       <!--Book step-->
-      <q-btn color="green" unelevated rounded label="(pt) Reservar"
+      <q-btn color="green" unelevated rounded :label="$tr('ibooking.cms.book')"
              class="full-width" v-else-if="newReservation"
              @click="createReservation" />
     </div>

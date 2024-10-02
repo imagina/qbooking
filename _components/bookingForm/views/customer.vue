@@ -3,7 +3,7 @@
     <!-- Choose user -->
     <div class="q-px-md">
       <div class="text-blue-grey text-bold text-center text-subtitle1 q-mb-md">
-        (pt) Seleccionar Cliente
+        {{$tr('ibooking.cms.chooseCustomer')}}
       </div>
       <dynamic-field :field="dynamicField" @update:modelValue="chooseCustomer" />
     </div>
@@ -45,7 +45,7 @@ export default defineComponent({
       },
       formNewUser: {},
       formCustomer: {
-        title: '(pt) Nuevo Cliente',
+        title: this.$tr('ibooking.cms.newCustomer'),
         blocks: [
           {
             fields: {

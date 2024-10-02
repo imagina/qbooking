@@ -19,8 +19,8 @@ export default function controller (props: any, emit: any)
     steps: [
       {
         value: 'customer',
-        title: i18n.tr('isite.cms.label.customer'),
-        description: '(PT) customer-desctiption',
+        title: i18n.tr('ibooking.cms.titleStepCustomer'),
+        description: i18n.tr('ibooking.cms.descriptionStepCustomer'),
         label: '',//kepp this to work with q-option
         required: 'customerId'
       },
@@ -128,7 +128,6 @@ export default function controller (props: any, emit: any)
         } else state.selected[stateName] = value;//Put the select item
       }
     },
-
     // Validate if item (category,service,resource) is selected
     isValueSelected: (stateName, value) =>
     {
@@ -165,11 +164,7 @@ export default function controller (props: any, emit: any)
             refresh: true, params: {
               include: 'customer,items.service',
               filter: {
-                date: {
-                  field: 'start_date',
-                  from: state.selected.date,
-                  to: state.selected.date
-                }
+                date: { field: 'start_date', from: state.selected.date, to: state.selected.date }
               }
             }
           });
@@ -182,10 +177,8 @@ export default function controller (props: any, emit: any)
     createReservation ()
     {
       state.loading = true;
-      //Get the availability
-      //const availability = computeds.selectedInformation.value.availability;
-      //Instance the reservation data
 
+      //Instance the reservation data
       let reservationData = {
         startDate: state.newReservation.start,
         endDate: state.newReservation.end,
@@ -220,11 +213,6 @@ export default function controller (props: any, emit: any)
       refresh: true, params: {}
     });
   });
-
-  // Watch
-  // watch(key, (newField, oldField): void => {
-  //
-  // }, {deep: true})
 
   return { ...refs, ...(toRefs(state)), ...computeds, ...methods, store };
 }
