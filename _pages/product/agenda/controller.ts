@@ -66,8 +66,9 @@ export default function controller (props: any, emit: any)
             dynamicField: row =>
             {
               return {
-                name: 'items',
+                name: 'services',
                 type: 'select',
+                mapValue: value => value?.serviceId,
                 props: {
                   label: i18n.tr('isite.cms.label.resource'),
                   useInput: true,
