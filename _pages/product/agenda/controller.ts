@@ -39,14 +39,49 @@ export default function controller (props: any, emit: any)
             label: i18n.tr('isite.cms.label.resource'),
             field: 'resource',
             align: 'left',
-            format: val => val?.title ?? '-'
+            format: val => val?.title ?? '-',
+            dynamicField: row =>
+            {
+              return {
+                name: 'resourceId',
+                type: 'select',
+                props: {
+                  label: i18n.tr('isite.cms.label.resource')
+                },
+                loadOptions: {
+                  apiRoute: 'apiRoutes.qbooking.resources',
+                  requestParams: {
+                    filter: { serviceId: row.items.map(item => item.serviceId) }
+                  }
+                }
+              };
+            }
           },
           {
-            name: 'service',
+            name: 'items',
             label: i18n.trp('isite.cms.label.service'),
             field: 'items',
             align: 'left',
-            format: val => val.length ? val.map(item => item.service.title).join(',') : '-'
+            format: val => val.length ? val.map(item => item.service.title).join(',') : '-',
+            dynamicField: row =>
+            {
+              return {
+                name: 'items',
+                type: 'select',
+                props: {
+                  label: i18n.tr('isite.cms.label.resource'),
+                  useInput: true,
+                  useChips: true,
+                  multiple: true
+                },
+                loadOptions: {
+                  apiRoute: 'apiRoutes.qbooking.services',
+                  requestParams: {
+                    filter: { categoryId: row.items[0].categoryId }
+                  }
+                }
+              };
+            }
           },
           {
             name: 'customer',
@@ -60,7 +95,8 @@ export default function controller (props: any, emit: any)
             label: i18n.tr('isite.cms.form.status'),
             field: 'statusModel',
             style: 'padding: 0px 5px',
-            contentType: (row) => {
+            contentType: (row) =>
+            {
               return {
                 template: 'colorCell',
                 props: {
@@ -68,8 +104,8 @@ export default function controller (props: any, emit: any)
                   color: row.statusModel.color,
                   icon: row.statusModel.icon
                 }
-              }
-            } ,
+              };
+            },
             dynamicField: row =>
             {
               return {
