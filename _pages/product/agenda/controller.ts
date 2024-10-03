@@ -66,7 +66,7 @@ export default function controller (props: any, emit: any)
             dynamicField: row =>
             {
               return {
-                name: 'services',
+                name: 'changeServices',
                 type: 'select',
                 mapValue: value => value?.serviceId,
                 props: {
