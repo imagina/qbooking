@@ -4,16 +4,16 @@ export default {
   data() {
     return {
       crudId: this.$uid()
-    }
+    };
   },
   computed: {
     crudData() {
       //Default filters
-      let defaultFilters = (config('app.mode') == 'ipanel') ? {createdBy: this.$store.state.quserAuth.userId} : {}
+      let defaultFilters = (config('app.mode') == 'ipanel') ? { createdBy: this.$store.state.quserAuth.userId } : {};
       //Crud data
       return {
         crudId: this.crudId,
-        entityName: config("main.qbooking.entityNames.services"),
+        entityName: config('main.qbooking.entityNames.services'),
         apiRoute: 'apiRoutes.qbooking.services',
         permission: 'ibooking.services',
         extraFormFields: 'ibooking.crud-fields.services',
@@ -22,14 +22,14 @@ export default {
         },
         read: {
           columns: [
-            {name: 'id', label: this.$tr('isite.cms.form.id'), field: 'id', style: 'width: 50px'},
-            {name: 'title', label: this.$tr('isite.cms.form.title'), field: 'title', align: 'rigth'},
+            { name: 'id', label: this.$tr('isite.cms.form.id'), field: 'id', style: 'width: 50px' },
+            { name: 'title', label: this.$tr('isite.cms.form.title'), field: 'title', align: 'rigth' },
             {
               name: 'category', label: this.$tr('isite.cms.form.category'),
               align: 'left', field: 'category', sortable: true,
               format: val => ((val && val.title) ? val.title : '-')
             },
-            {name: 'status', label: this.$tr('isite.cms.form.status'), field: 'status', align: 'left'},
+            { name: 'status', label: this.$tr('isite.cms.form.status'), field: 'status', align: 'left' },
             {
               name: 'shiftTime', label: this.$tr('isite.cms.shiftTime'), field: 'shiftTime', align: 'left',
               format: val => val ? `${val} ${this.$trp('isite.cms.label.minute')}` : '-'
@@ -48,24 +48,24 @@ export default {
             },
             {
               name: 'created_at', label: this.$tr('isite.cms.form.createdAt'), field: 'createdAt', align: 'left',
-              format: val => val ? this.$trd(val) : '-',
+              format: val => val ? this.$trd(val) : '-'
             },
             {
               name: 'updated_at', label: this.$tr('isite.cms.form.updatedAt'), field: 'updatedAt', align: 'left',
-              format: val => val ? this.$trd(val) : '-',
+              format: val => val ? this.$trd(val) : '-'
             },
-            {name: 'actions', label: this.$tr('isite.cms.form.actions'), align: 'left'},
+            { name: 'actions', label: this.$tr('isite.cms.form.actions'), align: 'left' }
           ],
-          requestParams: {include: 'category', filter: {...defaultFilters}}
+          requestParams: { include: 'category', filter: { ...defaultFilters } }
         },
         update: {
           title: this.$tr('ibooking.cms.updateService'),
-          requestParams: {include: 'categories', filter: {...defaultFilters}}
+          requestParams: { include: 'categories', filter: { ...defaultFilters } }
         },
         delete: true,
         formLeft: {
-          id: {value: ''},
-          userId: {value: this.$store.state.quserAuth.userId},
+          id: { value: '' },
+          userId: { value: this.$store.state.quserAuth.userId },
           title: {
             value: '',
             type: 'input',
@@ -74,8 +74,8 @@ export default {
               label: `${this.$tr('isite.cms.form.title')}*`,
               rules: [
                 val => !!val || this.$tr('isite.cms.message.fieldRequired')
-              ],
-            },
+              ]
+            }
           },
           slug: {
             value: '',
@@ -85,7 +85,7 @@ export default {
               label: `${this.$tr('isite.cms.form.slug')}*`,
               rules: [
                 val => !!val || this.$tr('isite.cms.message.fieldRequired')
-              ],
+              ]
             }
           },
           formId: {
@@ -94,11 +94,11 @@ export default {
             props: {
               label: `${this.$tr('isite.cms.label.form')}`,
               //clearable: true,
-              vIf: config('app.mode') == 'ipanel' ? false : true,
+              vIf: config('app.mode') == 'ipanel' ? false : true
             },
             loadOptions: {
               apiRoute: 'apiRoutes.qform.forms',
-              select: {label: 'title', id: 'id'}
+              select: { label: 'title', id: 'id' }
             }
           },
           description: {
@@ -109,7 +109,7 @@ export default {
               label: `${this.$tr('isite.cms.form.description')}*`,
               rules: [
                 val => !!val || this.$tr('isite.cms.message.fieldRequired')
-              ],
+              ]
             }
           }
         },
@@ -121,12 +121,12 @@ export default {
             props: {
               label: `${this.$tr('isite.cms.form.status')}*`,
               options: [
-                {label: this.$tr('isite.cms.label.enabled'), value: '1'},
-                {label: this.$tr('isite.cms.label.disabled'), value: '0'}
+                { label: this.$tr('isite.cms.label.enabled'), value: '1' },
+                { label: this.$tr('isite.cms.label.disabled'), value: '0' }
               ],
               rules: [
                 val => !!val || this.$tr('isite.cms.message.fieldRequired')
-              ],
+              ]
             }
           },
           withMeeting: {
@@ -135,8 +135,8 @@ export default {
             props: {
               label: `${this.$tr('isite.cms.label.meeting')}`,
               options: [
-                {label: this.$tr('isite.cms.label.enabled'), value: '1'},
-                {label: this.$tr('isite.cms.label.disabled'), value: '0'}
+                { label: this.$tr('isite.cms.label.enabled'), value: '1' },
+                { label: this.$tr('isite.cms.label.disabled'), value: '0' }
               ]
             }
           },
@@ -146,7 +146,28 @@ export default {
             props: {
               label: `${this.$tr('isite.cms.form.price')}`,
               type: 'number'
-            },
+            }
+          },
+          resourceValueType: {
+            value: null,
+            type: 'select',
+            isFakeField: true,
+            props: {
+              label: this.$tr('ibooking.cms.resourceValueType'),
+              options: [
+                { label: this.$tr('isite.cms.percentage'), value: 'percentage' },
+                { label: this.$tr('isite.form.price'), value: 'price' }
+              ]
+            }
+          },
+          resourceValue: {
+            value: 0,
+            type: 'input',
+            isFakeField: true,
+            props: {
+              label: this.$tr('ibooking.cms.resourceValue'),
+              type: 'number'
+            }
           },
           shiftTime: {
             value: 30,
@@ -158,7 +179,7 @@ export default {
                 hour: this.$tr('isite.cms.label.hour'),
                 hours: this.$trp('isite.cms.label.hour'),
                 minutes: this.$trp('isite.cms.label.minute'),
-                and: this.$tr('isite.cms.label.and'),
+                and: this.$tr('isite.cms.label.and')
               })
             }
           },
@@ -172,9 +193,9 @@ export default {
                 label: `${this.$tr('isite.cms.form.category')}*`,
                 rules: [
                   val => !!val || this.$tr('isite.cms.message.fieldRequired')
-                ],
-              },
-            },
+                ]
+              }
+            }
           },
           categories: {
             value: [],
@@ -186,8 +207,8 @@ export default {
                 label: this.$trp('isite.cms.form.category'),
                 multiple: true,
                 useChips: true
-              },
-            },
+              }
+            }
           },
           mediasSingle: {
             name: 'mediasSingle',
@@ -196,17 +217,17 @@ export default {
             props: {
               label: this.$tr('isite.cms.form.firstImage'),
               zone: 'mainimage',
-              entity: "Modules\\Ibooking\\Entities\\Service",
+              entity: 'Modules\\Ibooking\\Entities\\Service',
               entityId: null
             }
           }
-        },
-      }
+        }
+      };
     },
     //Crud info
     crudInfo() {
-      return this.$store.state.qcrudComponent.component[this.crudId] || {}
+      return this.$store.state.qcrudComponent.component[this.crudId] || {};
     }
-  },
-}
+  }
+};
 </script>
