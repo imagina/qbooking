@@ -1,6 +1,6 @@
 const moduleName = 'ibooking';
 const moduleVersion = 'v1';
-const urlBase = `/${moduleName}/${moduleVersion}`
+const urlBase = `/${moduleName}/${moduleVersion}`;
 
 
 export default {
@@ -13,4 +13,5 @@ export default {
   reservationItems: `${urlBase}/reservation-items`,
   availabilities: `${urlBase}/availabilities`,
   statuses: `${urlBase}/statuses`,
-}
+  resourceValueTypes: `${urlBase}/resource-value-types`
+};

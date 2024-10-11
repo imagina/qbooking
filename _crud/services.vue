@@ -153,11 +153,10 @@ export default {
             type: 'select',
             isFakeField: true,
             props: {
-              label: this.$tr('ibooking.cms.resourceValueType'),
-              options: [
-                { label: this.$tr('isite.cms.percentage'), value: 'percentage' },
-                { label: this.$tr('isite.form.price'), value: 'price' }
-              ]
+              label: this.$tr('ibooking.cms.resourceValueType')
+            },
+            loadOptions: {
+              apiRoute: 'apiRoutes.qbooking.resourceValueTypes'
             }
           },
           resourceValue: {
