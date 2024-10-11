@@ -23,9 +23,6 @@ export default function controller (props: any, emit: any)
         extraActions: ['search', 'new']
       },
       read: {
-        tableProps: {
-          dense: true
-        },
         title: i18n.tr('ibooking.cms.sidebar.panelReservations'),
         columns: [
           {
@@ -95,18 +92,8 @@ export default function controller (props: any, emit: any)
             name: 'statusModel',
             label: i18n.tr('isite.cms.form.status'),
             field: 'statusModel',
-            style: 'padding: 0px 5px',
-            contentType: (row) =>
-            {
-              return {
-                template: 'colorCell',
-                props: {
-                  label: row.statusModel.title,
-                  color: row.statusModel.color,
-                  icon: row.statusModel.icon
-                }
-              };
-            },
+            align: 'left',
+            format: val => `<i class="${val.icon}" style="color: ${val.color}" /> <span>${val.title}</span>`,
             dynamicField: row =>
             {
               return {
@@ -154,16 +141,35 @@ export default function controller (props: any, emit: any)
             label: i18n.tr('isite.cms.label.price'),
             field: 'items',
             align: 'left',
-            format: val =>
+            format: (val, row) =>
             {
               let total = 0;
               val.forEach(item => total += item.price);
-              return `$ ${i18n.trn(total)}`;
+
+              let config = row.transactions.length ?
+                { color: '#007bff', icon: 'fal fa-check-square' } :
+                { color: '#f39c12', icon: 'fal fa-hourglass-half' };
+
+              return `<i class="${config.icon}" style="color: ${config.color}" /> <span>$ ${i18n.trn(total)}</span>`;
+            },
+            dynamicField: row =>
+            {
+              if(row.transactions.length) return null
+              return {
+                name: 'pocketId',
+                type: 'select',
+                props: {
+                  label: i18n.tr('iwallet.cms.pocket')
+                },
+                loadOptions: {
+                  apiRoute: 'apiRoutes.qwallet.pockets'
+                }
+              };
             }
           }
         ],
         requestParams: {
-          include: 'customer,items.service,resource',
+          include: 'customer,items.service,resource,transactions',
           order: { field: 'start_date', way: 'asc' }
         },
         filters: {
