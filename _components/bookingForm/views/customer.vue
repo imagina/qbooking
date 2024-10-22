@@ -3,16 +3,18 @@
     <!-- Choose user -->
     <div class="q-px-md">
       <div class="text-blue-grey text-bold text-center text-subtitle1 q-mb-md">
-        {{$tr('ibooking.cms.chooseCustomer')}}
+        {{ $tr('ibooking.cms.chooseCustomer') }}
       </div>
       <dynamic-field :field="dynamicField" @update:modelValue="chooseCustomer" />
     </div>
-    <div class="q-pt-lg">
-      <q-separator class="q-my-lg" inset size="2px" />
-    </div>
     <!-- New user -->
-    <dynamic-form v-model="formNewUser" v-bind="formCustomer"
-                  @feedBack="chooseCustomer" />
+    <div v-if="newCustomerRole">
+      <div class="q-pt-lg">
+        <q-separator class="q-my-lg" inset size="2px" />
+      </div>
+      <dynamic-form v-model="formNewUser" v-bind="formCustomer"
+                    @feedBack="chooseCustomer" />
+    </div>
   </div>
 </template>
 
@@ -26,6 +28,7 @@ export default defineComponent({
   },
   data() {
     return {
+      newCustomerRole: this.$getSetting('ibooking::newCustomerRole'),
       dynamicField: {
         value: null,
         type: 'select',
@@ -86,8 +89,7 @@ export default defineComponent({
           apiRoute: 'apiRoutes.quser.users',
           extraData: (formData) => ({
             isActivated: 1,
-            roles: [2],//TODO: define roles to create neew customers
-            departments: [1],//TODO: define roles to create neew customers
+            roles: [this.$getSetting('ibooking::newCustomerRole')],
             password: this.$uid(),
             email: `${formData.phone}@mail.com`
           })
