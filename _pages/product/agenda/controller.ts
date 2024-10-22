@@ -1,7 +1,7 @@
 import { computed, reactive, ref, onMounted, toRefs, watch, getCurrentInstance } from 'vue';
 import service from '../agenda/services';
 import store from '../agenda/store';
-import { i18n, array } from 'src/plugins/utils';
+import { i18n, array, moment } from 'src/plugins/utils';
 
 
 export default function controller (props: any, emit: any)
@@ -126,14 +126,38 @@ export default function controller (props: any, emit: any)
             label: i18n.tr('isite.cms.startTime'),
             field: 'startDate',
             align: 'left',
-            format: val => val ? i18n.trd(val, { type: 'time' }) : '-'
+            format: val => val ? i18n.trd(val, { type: 'time' }) : '-',
+            dynamicField: {
+              name: 'startTime',
+              type: 'hour',
+              mapValue: value =>
+              {
+                let timeMoment = moment(value, 'YYYY-MM-DD HH:mm:ss', true);
+                return timeMoment.isValid() ? timeMoment.format('HH:mm') : value;
+              },
+              props: {
+                label: i18n.tr('isite.cms.startTime')
+              }
+            }
           },
           {
             name: 'endTime',
             label: i18n.tr('isite.cms.endTime'),
             field: 'endDate',
             align: 'left',
-            format: val => val ? i18n.trd(val, { type: 'time' }) : '-'
+            format: val => val ? i18n.trd(val, { type: 'time' }) : '-',
+            dynamicField: {
+              name: 'endTime',
+              type: 'hour',
+              mapValue: value =>
+              {
+                let timeMoment = moment(value, 'YYYY-MM-DD HH:mm:ss', true);
+                return timeMoment.isValid() ? timeMoment.format('HH:mm') : value;
+              },
+              props: {
+                label: i18n.tr('isite.cms.endTime')
+              }
+            }
           },
           {
             name: 'shiftTime',
@@ -259,8 +283,24 @@ export default function controller (props: any, emit: any)
               apiRoute: 'apiRoutes.qbooking.categories'
             }
           }
-        },
-        help: {}
+        }
+      },
+      beforeUpdate: ({ val, row, fieldName }) =>
+      {
+        return new Promise(resolve =>
+        {
+          switch (fieldName)
+          {
+            case'startTime':
+              row.startDate = `${moment(row.startDate).format('YYYY-MM-DD')} ${val}`;
+              break;
+            case'endTime':
+              row.endDate = `${moment(row.endDate).format('YYYY-MM-DD')} ${val}`;
+              break;
+          }
+
+          resolve(row);
+        });
       }
     },
     showBookingForm: false,
