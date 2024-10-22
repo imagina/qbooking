@@ -86,7 +86,12 @@ export default function controller (props: any, emit: any)
             label: i18n.tr('isite.cms.label.customer'),
             field: 'customer',
             align: 'left',
-            format: val => val ? `${val.firstName} ${val.lastName}` : '-'
+            format: val => val ? `${val.firstName} ${val.lastName}` : '-',
+            onClick: (val, row) =>
+            {
+              state.rowToUpdate = row;
+              state.showCustomerForm = true;
+            }
           },
           {
             name: 'statusModel',
@@ -154,7 +159,7 @@ export default function controller (props: any, emit: any)
             },
             dynamicField: row =>
             {
-              if(row.transactions.length) return null
+              if (row.transactions.length) return null;
               return {
                 name: 'pocketId',
                 type: 'select',
@@ -258,7 +263,9 @@ export default function controller (props: any, emit: any)
         help: {}
       }
     },
-    showBookingForm: false
+    showBookingForm: false,
+    showCustomerForm: false,
+    rowToUpdate: null
   });
 
   // Computed
@@ -272,6 +279,18 @@ export default function controller (props: any, emit: any)
     {
       state.showBookingForm = false;
       refs.dynamicListComponent.value.getData({ page: 1 }, true);
+    },
+    // Update the reservation customer
+    changeCustomer: (customer) =>
+    {
+      //Use the dynamicList to update the row
+      refs.dynamicListComponent.value.updateRow({
+        ...state.rowToUpdate,
+        customerId: customer.id
+      });
+      //Reset values
+      state.showCustomerForm = false;
+      state.rowToUpdate = null;
     }
   };
 

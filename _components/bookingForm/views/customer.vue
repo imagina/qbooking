@@ -23,8 +23,12 @@ import { defineComponent, inject } from 'vue';
 
 export default defineComponent({
   setup(props) {
+    const controller = inject('controller', null);
     // Inject the controller from the parent
-    return inject('controller');
+    return { ...controller, existController: !!controller };
+  },
+  props: {
+    customerId: { default: null }
   },
   data() {
     return {
@@ -100,8 +104,11 @@ export default defineComponent({
   computed: {},
   methods: {
     chooseCustomer(customer) {
-      this.selected.customerId = customer;
-      this.nextStep();
+      if (this.existController) {
+        this.selected.customerId = customer;
+        this.nextStep();
+      }
+      this.$emit('chooseCustomer', customer);
     }
   }
 });
