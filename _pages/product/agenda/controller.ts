@@ -199,7 +199,7 @@ export default function controller (props: any, emit: any)
         ],
         requestParams: {
           include: 'customer,items.service,resource,transactions',
-          order: { field: 'start_date', way: 'asc' }
+          order: { field: 'start_date', way: 'desc' }
         },
         filters: {
           date: {
