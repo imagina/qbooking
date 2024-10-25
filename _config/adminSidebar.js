@@ -7,6 +7,7 @@ export default [
     icon: 'fa-light fa-check-to-slot',
     children: [
       pages.qbooking.productAgenda,
+      pages.qbooking.productDashboard,
       pages.mainqbooking.categories,
       pages.mainqbooking.services,
       pages.qbooking.resources,

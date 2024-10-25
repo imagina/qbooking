@@ -10,6 +10,7 @@ export default {
   services: `${urlBase}/services`,
   resources: `${urlBase}/resources`,
   reservations: `${urlBase}/reservations`,
+  reservationsDashboard: `${urlBase}/reservations/dashboard/index`,
   reservationItems: `${urlBase}/reservation-items`,
   availabilities: `${urlBase}/availabilities`,
   statuses: `${urlBase}/statuses`,
