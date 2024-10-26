@@ -10,7 +10,8 @@ export default function controller (props: any, emit: any)
 
   // Refs
   const refs = {
-    dynamicListComponent: ref()
+    dynamicListComponent: ref(),
+    crudReservation: ref()
   };
 
   // States
@@ -24,7 +25,7 @@ export default function controller (props: any, emit: any)
       },
       read: {
         title: i18n.tr('ibooking.cms.sidebar.panelReservations'),
-        columns: [
+        columns: [...[
           {
             name: 'id',
             label: 'ID',
@@ -196,7 +197,10 @@ export default function controller (props: any, emit: any)
               };
             }
           }
-        ],
+        ], ...(!proxy.$hasAccess('ibooking.reservations.destroy') ? [] : [{
+          name: 'actions', label: i18n.tr('isite.cms.form.actions'),
+          align: 'center'
+        }])],
         requestParams: {
           include: 'customer,items.service,resource,transactions',
           order: { field: 'start_date', way: 'desc' }
@@ -285,6 +289,14 @@ export default function controller (props: any, emit: any)
           }
         }
       },
+      actions: !proxy.$hasAccess('ibooking.reservations.destroy') ? [] : [
+        {//Delete action
+          icon: 'fa-light fa-trash-can',
+          name: 'delete',
+          label: i18n.tr('isite.cms.label.delete'),
+          action: async (item) => refs.crudReservation.value.delete(item)
+        }
+      ],
       beforeUpdate: ({ val, row, fieldName }) =>
       {
         return new Promise(resolve =>

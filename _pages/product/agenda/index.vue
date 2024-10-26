@@ -13,6 +13,11 @@
                   :title="$tr('ibooking.cms.updateReservation')">
       <customer-form @chooseCustomer="changeCustomer" />
     </master-modal>
+    <!-- CRUD Reservation-->
+    <crud :crud-data="import('modules/qbooking/_crud/reservations.vue')"
+          :custom-data="{apiRoute: 'apiRoutes.qbooking.reservations'}"
+          type="onlyDelete" ref="crudReservation"
+          @deleted="$refs.dynamicListComponent.getData({ page: 1 }, true)" />
   </div>
 </template>
 <script lang="ts">
