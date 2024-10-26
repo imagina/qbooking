@@ -18,7 +18,7 @@
     <!--Booking content-->
     <div class="row q-col-gutter-md">
       <!--Stepper content-->
-      <div class="col-8">
+      <div class="col-12 col-md-8">
         <q-tab-panels v-model="step" animated ref="stepsForm">
           <!--Step Customer-->
           <q-tab-panel name="customer">
@@ -91,7 +91,7 @@
         </q-tab-panels>
       </div>
       <!--Resume-->
-      <div class="col-4">
+      <div class="col-12 col-md-4">
         <resume />
       </div>
     </div>
