@@ -38,7 +38,7 @@
               </div>
               <q-separator vertical color="green-1" size="2px" />
               <div class="col">
-                <div class="text-caption">{{ $tr('isite.cms.label.quantity') }}</div>
+                <div class="text-caption">{{ $trp('isite.cms.label.customer') }}</div>
                 <div class="text-green text-bold">{{ dashboard.reservations.quantity }}</div>
               </div>
               <div class="col-12">
@@ -106,9 +106,9 @@
                   </div>
                   <q-separator vertical color="deep-purple-1" size="2px" />
                   <div class="col">
-                    <div class="text-caption">{{ $tr('isite.cms.label.quantity') }}</div>
+                    <div class="text-caption">{{ $trp('isite.cms.label.customer') }}</div>
                     <div class="text-deep-purple text-bold">
-                      {{ resource.reduce((acc, item) => acc + item.quantity, 0) }}
+                      {{ dashboard.reservationsByResource[resourceName].quantity }}
                     </div>
                   </div>
                   <div class="col-12">
