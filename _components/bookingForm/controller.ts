@@ -164,6 +164,7 @@ export default function controller (props: any, emit: any)
             refresh: true, params: {
               include: 'customer,items.service',
               filter: {
+                activeReservations: true,
                 date: { field: 'start_date', from: state.selected.date, to: state.selected.date }
               }
             }
