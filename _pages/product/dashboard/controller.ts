@@ -1,6 +1,7 @@
 import { computed, reactive, ref, onMounted, toRefs, watch, getCurrentInstance } from 'vue';
 import service from 'modules/qbooking/_pages/product/dashboard/services';
 import store from 'modules/qbooking/_pages/product/dashboard/store';
+import { i18n } from 'src/plugins/utils';
 
 export default function controller (props: any, emit: any)
 {
@@ -20,7 +21,7 @@ export default function controller (props: any, emit: any)
         type: 'dateRange',
         quickFilter: true,
         props: {
-          label: 'Date',
+          label: i18n.tr('isite.cms.form.date'),
           clearable: true,
           removeTime: true,
           autoClose: true,
@@ -42,7 +43,7 @@ export default function controller (props: any, emit: any)
     getDashboard: (refresh = false) =>
     {
       state.loading = true;
-      service.getDashboard(refresh, {filter: state.filters}).then(response =>
+      service.getDashboard(refresh, { filter: state.filters }).then(response =>
       {
         state.dashboard = response.data;
         state.loading = false;
