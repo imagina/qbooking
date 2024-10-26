@@ -22,6 +22,7 @@ export default {
         refresh,
         params: {
           filter: { categoryId: categoryId },
+          order: { field: 'id', way: 'asc' },
           include: 'category'
         }
       };
@@ -38,7 +39,7 @@ export default {
         refresh, params: {
           filter: { services: services },
           include: 'schedule.workTimes'
-         }
+        }
       };
       //Request
       baseService.index('apiRoutes.qbooking.resources', requestParams)
