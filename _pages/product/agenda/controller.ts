@@ -180,7 +180,11 @@ export default function controller (props: any, emit: any)
                 { color: '#007bff', icon: 'fal fa-check-square' } :
                 { color: '#f39c12', icon: 'fal fa-hourglass-half' };
 
-              return `<i class="${config.icon}" style="color: ${config.color}" /> <span>$ ${i18n.trn(total)}</span>`;
+              let pockets = Array.from(new Set(row.transactions.map(item => item.toPocket?.title ?? '-')))
+                .join(',')
+
+              return `<div style="color: ${config.color}"><i class="${config.icon} q-mr-sm" ></i><span>$ ${i18n.trn(total)}</span></div>
+                      <div class="text-grey-8" style="font-size: 10px">${pockets}</div>`;
             },
             dynamicField: row =>
             {
@@ -202,7 +206,7 @@ export default function controller (props: any, emit: any)
           align: 'center'
         }])],
         requestParams: {
-          include: 'customer,items.service,resource,transactions',
+          include: 'customer,items.service,resource,transactions.toPocket',
           order: { field: 'start_date', way: 'desc' }
         },
         filters: {
