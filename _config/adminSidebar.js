@@ -8,6 +8,7 @@ export default [
     children: [
       pages.qbooking.productAgenda,
       pages.qbooking.productDashboard,
+      pages.qbooking.productResourceWorkspace,
       pages.mainqbooking.categories,
       pages.mainqbooking.services,
       pages.qbooking.resources,

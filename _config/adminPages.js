@@ -21,6 +21,17 @@ export default {
     title: 'ibooking.cms.sidebar.dashboard',
     icon: 'fa-light fa-chart-tree-map'
   },
+  productResourceWorkspace: {
+    permission: 'ibooking.resources.workspace',
+    activated: true,
+    authenticated: true,
+    path: '/booking/resource/workspace',
+    name: 'qbooking.admin.resource.workspace',
+    page: () => import('modules/qbooking/_pages/product/resourceWorkspace'),
+    layout: () => import('layouts/master.vue'),
+    title: 'ibooking.cms.sidebar.resourceWorkspace',
+    icon: 'fa-light fa-chart-tree-map'
+  },
   resources: {
     permission: 'ibooking.resources.manage',
     activated: true,
