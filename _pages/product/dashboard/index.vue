@@ -1,5 +1,6 @@
 <template>
   <div id="ReservationDashboardPage" class="relative-position">
+    <!--Page Actions-->
     <div class="q-mb-md">
       <!--Page Actions-->
       <page-actions :title="$tr('ibooking.cms.sidebar.dashboard')"

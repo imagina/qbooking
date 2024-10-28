@@ -25,7 +25,7 @@ export default function controller (props: any, emit: any)
           clearable: true,
           removeTime: true,
           autoClose: true,
-          field: 'created_at'
+          field: 'start_date'
         }
       }
     },

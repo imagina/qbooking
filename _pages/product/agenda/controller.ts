@@ -68,7 +68,7 @@ export default function controller (props: any, emit: any)
                 type: 'select',
                 mapValue: value => value?.serviceId,
                 props: {
-                  label: i18n.tr('isite.cms.label.resource'),
+                  label: i18n.trp('ibooking.cms.service'),
                   useInput: true,
                   useChips: true,
                   multiple: true
@@ -180,7 +180,7 @@ export default function controller (props: any, emit: any)
                 { color: '#007bff', icon: 'fal fa-check-square' } :
                 { color: '#f39c12', icon: 'fal fa-hourglass-half' };
 
-              let pockets = Array.from(new Set(row.transactions.map(item => item.toPocket?.title ?? '-')))
+              let pockets = Array.from(new Set(row.transactions.map(item => item.toPocket?.title ?? '')))
                 .join(',')
 
               return `<div style="color: ${config.color}"><i class="${config.icon} q-mr-sm" ></i><span>$ ${i18n.trn(total)}</span></div>
@@ -214,7 +214,7 @@ export default function controller (props: any, emit: any)
             type: 'dateRange',
             quickFilter: true,
             props: {
-              label: 'Date',
+              label: i18n.tr('isite.cms.form.date'),
               clearable: true,
               removeTime: true,
               autoClose: true,
