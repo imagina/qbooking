@@ -97,7 +97,7 @@ export default function controller (props: any, emit: any)
         }).then(response => state.reservations.approved = response.data),
         //Get in progress reservations
         service.getDashboard(refresh, {
-          filter: state.filters
+          filter: {...state.filters, userResourceId: proxy.$store.state.quserAuth.userId}
         }).then(response => state.dashboard = response.data)
       ]);
       state.loading = false;
