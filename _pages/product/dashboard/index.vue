@@ -40,7 +40,7 @@
               <q-separator vertical color="green-1" size="2px" />
               <div class="col">
                 <div class="text-caption">{{ $trp('isite.cms.label.customer') }}</div>
-                <div class="text-green text-bold">{{ dashboard.reservations.data.quantity }}</div>
+                <div class="text-green text-bold">{{ dashboard.reservations.data.completedQuantity }}</div>
               </div>
               <div class="col-12">
                 <q-separator color="green-1" size="2px" />
