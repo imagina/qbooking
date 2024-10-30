@@ -181,7 +181,7 @@ export default function controller (props: any, emit: any)
                 { color: '#f39c12', icon: 'fal fa-hourglass-half' };
 
               let pockets = Array.from(new Set(row.transactions.map(item => item.toPocket?.title ?? '')))
-                .join(',')
+                .join(',');
 
               return `<div style="color: ${config.color}"><i class="${config.icon} q-mr-sm" ></i><span>$ ${i18n.trn(total)}</span></div>
                       <div class="text-grey-8" style="font-size: 10px">${pockets}</div>`;
@@ -200,6 +200,23 @@ export default function controller (props: any, emit: any)
                 }
               };
             }
+          },
+          {
+            name: 'comment',
+            label: i18n.tr('isite.cms.label.comment'),
+            field: 'options',
+            align: 'left',
+            style: 'max-width : 250px',
+            format: val => val?.comment ?? '-',
+            dynamicField: val => ({
+              value: val?.comment ?? '',
+              type: 'input',
+              props: {
+                label: `${i18n.tr('isite.cms.label.comment')}`,
+                type: 'textarea',
+                rows: '3'
+              }
+            })
           }
         ], ...(!proxy.$hasAccess('ibooking.reservations.destroy') ? [] : [{
           name: 'actions', label: i18n.tr('isite.cms.form.actions'),
@@ -312,6 +329,10 @@ export default function controller (props: any, emit: any)
               break;
             case'endTime':
               row.endDate = `${moment(row.endDate).format('YYYY-MM-DD')} ${val}`;
+              break;
+            case'comment':
+              row.options = {comment: val}
+              console.warn(">>> comment:", val, row)
               break;
           }
 
