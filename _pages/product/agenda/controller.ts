@@ -208,8 +208,8 @@ export default function controller (props: any, emit: any)
             align: 'left',
             style: 'max-width : 250px',
             format: val => val?.comment ?? '-',
-            dynamicField: val => ({
-              value: val?.comment ?? '',
+            dynamicField: row => ({
+              mapValue: val => (val?.comment ?? val ?? ''),
               type: 'input',
               props: {
                 label: `${i18n.tr('isite.cms.label.comment')}`,
@@ -331,8 +331,7 @@ export default function controller (props: any, emit: any)
               row.endDate = `${moment(row.endDate).format('YYYY-MM-DD')} ${val}`;
               break;
             case'comment':
-              row.options = {comment: val}
-              console.warn(">>> comment:", val, row)
+              row.options = { comment: val };
               break;
           }
 
