@@ -1,7 +1,7 @@
 <template>
   <div id="masterFooter">
     <q-footer class="shadow-2">
-      <div id="footerContent" class="row q-md-hide items-center">
+      <div id="footerContent" class="row q-md-hide items-center q-pb-md">
         <q-toolbar id="toolbarTop">
           <q-btn icon="fas fa-bars" unelevated
                  class="text-white buttonToogleMenuClose"
