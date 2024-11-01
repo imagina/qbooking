@@ -25,7 +25,7 @@
 </template>
 <script>
 //mixins
-import sidebarMixins from 'modules/qsite/_mixins/sidebarMixins'
+import sidebarMixins from 'src/layouts/themes/_mixins/sidebar'
 //Components
 import menuList from 'modules/qsite/_components/master/recursiveItem'
 import { eventBus } from 'src/plugins/utils'
