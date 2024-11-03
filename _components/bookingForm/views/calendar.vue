@@ -193,7 +193,7 @@ export default defineComponent({
       // Loop through each time slot and find gaps
       sortedSlots.forEach(workTime =>
       {
-        if (this.$moment(this.selected.date).weekday() == workTime.dayId)
+        if ((this.$moment(this.selected.date).weekday() || 7)  == workTime.dayId)
         {
           if (timeToMinutes(workTime.startTime) > timeToMinutes(lastEnd)) disableSlots.push({
             startTime: lastEnd, endTime: workTime.startTime
