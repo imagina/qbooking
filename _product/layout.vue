@@ -5,7 +5,7 @@
       id="bookingHeader"
       :class="{ 'header-bottom-mobile': $q.screen.lt.md }"
     >
-      <q-btn-group push class="q-mx-auto">
+      <q-btn-group unelevated class="q-mx-auto">
         <!--Menu-->
         <template v-for="(item, key) in menu" :key="key">
           <!-- Button with submenu -->
@@ -198,7 +198,19 @@ export default {
 
 <style lang="scss">
 body {
-  background-color: #F4E1D2;
+  background-color: #ececec;
+
+  #pageActionscomponent {
+    .title-content {
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+    }
+  }
+
+  .box {
+    background-color: #fafafa;
+  }
 }
 
 #bookingHeader {
@@ -212,13 +224,14 @@ body {
   margin-left: auto;
   margin-right: auto;
 
-  #header__toolbar {
-    border-radius: 15px;
+  .q-btn-group {
+    border-radius: 20px;
   }
 
-  .q-btn{
-    background-color: #D9B9A1 !important;
-    color: #4A4A47 !important;
+  .q-btn {
+    background-color: #e0e0e0 !important;
+    color: #2d2d2d !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }
 }
 

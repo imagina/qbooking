@@ -4,8 +4,8 @@
     <div class="q-mb-md">
       <!--Page Actions-->
       <page-actions :title="$tr('ibooking.cms.sidebar.dashboard')"
+                    icon="fa-solid fa-chart-waterfall"
                     @refresh="getDashboard(true)"
-                    :dynamic-filter="dynamicFilters"
                     @toggleDynamicFilterModal="showDynamicFilterModal = true" />
       <!-- dynamicFilter -->
       <dynamicFilter
@@ -25,7 +25,7 @@
           <!--Total-->
           <div class="box q-mb-md">
             <!-- Title -->
-            <div class="text-center bg-green-1 q-pa-md">
+            <div class="text-center q-pa-md" style="background-color: #D1F2EB">
               <q-icon name="fa-light fa-check-to-slot" size="md" color="green" />
               <div class="text-green text-bold">
                 {{ $trp('ibooking.cms.reservation') }}
@@ -68,7 +68,7 @@
           <!-- By Services -->
           <div class="box">
             <!-- Title -->
-            <div class="text-center bg-blue-1 q-pa-md">
+            <div class="text-center q-pa-md" style="background-color: #D9EAF7">
               <q-icon name="fa-light fa-handshake" size="md" color="blue" />
               <div class="text-blue text-bold">
                 {{ $trp('ibooking.cms.service') }}
@@ -102,7 +102,7 @@
                  :key="categoryName" class="col-12 col-md-4">
               <div class="box">
                 <!-- Title -->
-                <div class="text-center bg-deep-orange-1 q-pa-md">
+                <div class="text-center q-pa-md" style="background-color: #FFE2DB">
                   <q-icon name="fa-light fa-layer-group" size="md" color="deep-orange" />
                   <div class="text-deep-orange text-bold">
                     {{ categoryName }}
@@ -135,7 +135,7 @@
                  :key="resourceName" class="col-12 col-md-4">
               <div class="box">
                 <!-- Title -->
-                <div class="text-center bg-deep-purple-1 q-pa-md">
+                <div class="text-center q-pa-md" style="background-color: #E9D9F7">
                   <q-icon name="fa-light fa-chess-knight" size="md" color="deep-purple" />
                   <div class="text-deep-purple text-bold">
                     {{ resourceName }}
