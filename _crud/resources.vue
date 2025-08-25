@@ -118,7 +118,7 @@ export default {
             props: {
               label: this.$tr('isite.cms.form.firstImage'),
               zone: 'mainimage',
-              entity: "Modules\\Ibooking\\Entities\\Resource",
+              entity: "Modules\\Ibooking\\Models\\Resource",
               entityId: null
             }
           },
